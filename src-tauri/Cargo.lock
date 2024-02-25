@@ -1009,6 +1009,7 @@ dependencies = [
 name = "file_shredder"
 version = "0.0.0"
 dependencies = [
+ "notify-rust",
  "rusqlite",
  "serde",
  "serde_json",
