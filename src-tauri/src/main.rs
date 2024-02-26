@@ -42,8 +42,7 @@ fn main() {
                 auth_commands::authenticate_employee,
                 auth_commands::authenticate_admin,
                 user_commands::get_employee,
-                user_commands::get_admin,
-                user_commands::update_admin,
+                user_commands::get_admin
             ]
         )
         .run(tauri::generate_context!())

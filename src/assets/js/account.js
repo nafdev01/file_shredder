@@ -49,3 +49,50 @@ if (isAdminLoggedIn()) {
 
 }
 
+
+if (isEmployeeLoggedIn()) {
+    const employeeId = localStorage.getItem('employeeId');
+    const employeeUsername = localStorage.getItem('employeeUsername');
+
+    const employeeUsernameInput = document.getElementById('employee-username-input');
+    const employeeNameInput = document.getElementById('employee-name-input')
+    const employeeEmailInput = document.getElementById('employee-email-input')
+    const employeePhoneNoInput = document.getElementById('employee-phone-no-input')
+
+
+    var employeeName = null;
+    var employeeEmail = null;
+    var employeePhoneNo = null;
+    var employeeDepartment = null;
+
+    invoke('get_employee', {
+        username: employeeUsername,
+    }).then(response => {
+        let employee = response;
+        employeeName = employee.full_name;
+        employeeEmail = employee.email;
+        employeePhoneNo = employee.phone_no;
+        employeeDepartment = employee.department;
+
+        // set the values of the HTML elements
+        document.getElementById('employee-username').innerHTML = `@${employeeUsername}`;
+        document.getElementById('employee-name').innerHTML = employeeName;
+        document.getElementById('employee-email').innerHTML = employeeEmail;
+        document.getElementById('employee-phone-no').innerHTML = employeePhoneNo;
+        document.getElementById('employee-department').innerHTML = employeeDepartment;
+
+        // set the values for the input elements
+        employeeUsernameInput.value = employeeUsername;
+        employeeNameInput.value = employeeName;
+        employeeEmailInput.value = employeeEmail;
+        employeePhoneNoInput.value = employeePhoneNo;
+    }
+    ).catch(error => {
+        notification.sendNotification({
+            title: `Error!`,
+            body: `${error}`, // ensure error is a string
+        });
+
+    })
+
+}
