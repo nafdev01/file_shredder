@@ -188,37 +188,179 @@
 		</div>
 	</header>
 
+
 	<div class="app-wrapper">
-
 		<div class="app-content pt-3 p-md-3 p-lg-4">
-			<div class="container-xl min-vh-100">
+			<div class="container-xl">
 
-				<h1 class="app-page-title">Admin Dashboard</h1>
-
-				<div class="app-card alert alert-dismissible shadow-sm mb-4 border-left-decoration" role="alert">
-					<div class="inner">
-						<div class="app-card-body p-3 p-lg-4">
-							<h3 class="mb-3" id="welcome-card"></h3>
-							<div class="row gx-5 gy-3">
-								<div class="col-12 col-lg-9">
-									<div>
-										<p>
-											File Shredder is an easy to use, secure file erasure tool that ensures your
-											sensitive data is securely and irretrievably wiped from your device.
-										</p>
+				<h1 class="app-page-title">My Account</h1>
+				<div class="row gy-4">
+					<div class="col-12 col-lg-6">
+						<div class="app-card app-card-account shadow-sm d-flex flex-column align-items-start">
+							<div class="app-card-header p-3 border-bottom-0">
+								<div class="row align-items-center gx-3">
+									<div class="col-auto">
+										<div class="app-icon-holder">
+											<i class="fas fa-user"></i>
+										</div>
+									</div>
+									<div class="col-auto">
+										<h4 class="app-card-title">Profile</h4>
 									</div>
 								</div>
 							</div>
-							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							<div class="app-card-body px-4 w-100">
+								<div class="item border-bottom py-3">
+									<div class="row justify-content-between align-items-center">
+										<div class="col-auto">
+											<div class="item-label">
+												<strong>Username</strong>
+											</div>
+											<div class="item-data" id="admin-username">@username</div>
+										</div>
+									</div>
+								</div>
+								<div class="item border-bottom py-3">
+									<div class="row justify-content-between align-items-center">
+										<div class="col-auto">
+											<div class="item-label">
+												<strong>Name</strong>
+											</div>
+											<div class="item-data" id="admin-name"></div>
+										</div>
+									</div>
+								</div>
+								<div class="item border-bottom py-3">
+									<div class="row justify-content-between align-items-center">
+										<div class="col-auto">
+											<div class="item-label">
+												<strong>Email</strong>
+											</div>
+											<div class="item-data" id="admin-email"></div>
+										</div>
+									</div>
+								</div>
+								<div class="item border-bottom py-3">
+									<div class="row justify-content-between align-items-center">
+										<div class="col-auto">
+											<div class="item-label">
+												<strong>Phone Number</strong>
+											</div>
+											<div class="item-data" id="admin-phone-no">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="item border-bottom py-3">
+									<div class="row justify-content-between align-items-center">
+										<div class="col-auto">
+											<div class="item-label">
+												<strong>Department</strong>
+											</div>
+											<div class="item-data" id="admin-department">
+												Admin Department
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="app-card-footer p-4 mt-auto">
+								<!-- Button trigger modal -->
+								<button type="button" class="btn app-btn-secondary" data-bs-toggle="modal"
+									data-bs-target="#manageProfileModal">
+									Manage Profile
+								</button>
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<div class="row g-4 mb-4">
-					<div class="col-12">
-						<div class="app-card app-card-stat shadow-sm h-100">
-							<div class="app-card-body p-3 p-lg-4">
+					<!-- Manage Security Modal -->
+					<div class="modal fade" id="manageProfileModal" tabindex="-1"
+						aria-labelledby="manageProfileModalLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h1 class="modal-title fs-5 text-center" id="manageProfileModalLabel">
+										Update Profile Details
+									</h1>
+									<button type="button" class="btn-close" data-bs-dismiss="modal"
+										aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form method="post" id="admin-profile-form">
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="username-addon">
+												<i class="fas fa-at"></i>
+											</span>
+											<input type="text" class="form-control" placeholder="Username"
+												aria-label="Username" aria-describedby="username-addon"
+												id="admin-username-input" name="username">
+										</div>
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="full-name-addon">
+												<i class="fas fa-user"></i>
+											</span>
+											<input type="text" class="form-control" placeholder="Name" aria-label="Name"
+												aria-describedby="full-name-addon" id="admin-name-input" name="name">
+										</div>
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="email-addon">
+												<i class="fas fa-envelope"></i>
+											</span>
+											<input type="email" class="form-control" placeholder="Email"
+												aria-label="Email" aria-describedby="email-addon" id="admin-email-input"
+												name="email">
+										</div>
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="phone-no-addon">
+												<i class="fas fa-phone"></i>
+											</span>
+											<input type="tel" class="form-control" placeholder="Phone Number"
+												aria-label="Phone Number" aria-describedby="phone-no-addon"
+												id="admin-phone-no-input" name="phone">
+										</div>
+										<div class="d-flex justify-content-evenly">
+											<button type="submit" class="btn btn-warning">Update Profile</button>
+											<button type="button" class="btn btn-secondary"
+												data-bs-dismiss="modal">Cancel</button>
+										</div>
+									</form>
 
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 col-lg-6">
+						<div class="app-card app-card-account shadow-sm d-flex flex-column align-items-start">
+							<div class="app-card-header p-3 border-bottom-0">
+								<div class="row align-items-center gx-3">
+									<div class="col-auto">
+										<div class="app-icon-holder">
+											<i class="fas fa-shield"></i>
+										</div>
+									</div>
+									<div class="col-auto">
+										<h4 class="app-card-title">Security</h4>
+									</div>
+								</div>
+							</div>
+							<div class="app-card-body px-4 w-100">
+
+								<div class="item border-bottom py-3">
+									<div class="row justify-content-between align-items-center">
+										<div class="col-auto">
+											<div class="item-label">
+												<strong>Password</strong>
+											</div>
+											<div class="item-data">••••••••</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="app-card-footer p-4 mt-auto">
+								<a class="btn app-btn-secondary" href="#">Manage Security</a>
 							</div>
 						</div>
 					</div>
@@ -242,10 +384,6 @@
 	<script src="assets/plugins/popper.min.js"></script>
 	<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 
-	<!-- Charts JS -->
-	<script src="assets/plugins/chart.js/chart.min.js"></script>
-	<script src="assets/js/index-charts.js"></script>
-
 	<!-- Page Specific JS -->
 	<script src="assets/js/app.js"></script>
 
@@ -255,6 +393,7 @@
 	<!-- custom js -->
 	<script src="assets/js/logout.js"></script>
 	<script src="assets/js/session.js"></script>
+	<script src="assets/js/account.js"></script>
 
 	<script>
 		if (!isAdminLoggedIn()) {
@@ -264,8 +403,9 @@
 			});
 			window.location.href = 'index.html';
 		}
-		document.getElementById('welcome-card').innerHTML = `Welcome, ${localStorage.getItem('adminName')}`;
+		document.getElementById('admin-username').innerHTML = localStorage.getItem('adminUsername');
 	</script>
+
 
 </body>
 

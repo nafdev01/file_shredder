@@ -57,7 +57,7 @@ adminForm.addEventListener('submit', (event) => {
         password: adminPassword,
     }).then(response => {
         let admin = response;
-        loginAdmin(admin.employee_id, admin.username, admin.full_name);
+        loginAdmin(admin.admin_id, admin.username, admin.full_name);
         Swal.fire({
             title: `Welcome back ${admin.username}!`,
             html: `Please wait while we log you in <b></b>`,

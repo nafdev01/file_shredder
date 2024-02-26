@@ -39,3 +39,11 @@ function isAdminLoggedIn() {
     let AdminLoggedIn = localStorage.getItem('adminId') !== null;
     return AdminLoggedIn;
 }
+
+
+// function to update admin session details
+function updateAdminSessionDetails(adminId, adminUsername, adminFullName) {
+    localStorage.setItem('adminId', `${adminId}`);
+    localStorage.setItem('adminUsername', `${adminUsername}`);
+    localStorage.setItem('adminName', `${adminFullName}`);
+}

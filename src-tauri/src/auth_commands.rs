@@ -1,6 +1,7 @@
 use crate::initialize_app::CustomError;
 use crate::initialize_app::Employee;
 use crate::initialize_app::Department;
+use crate::initialize_app::Admin;
 
 #[tauri::command]
 pub fn get_departments() -> Result<Vec<Department>, CustomError> {
@@ -50,7 +51,7 @@ pub fn authenticate_employee(username: String, password: String) -> Result<Emplo
     let conn = rusqlite::Connection::open("shredder.db")?;
 
     let mut stmt = conn.prepare(
-        "SELECT employee_id, full_name, username, email, phone_no, created_at 
+        "SELECT employee_id, full_name, username, email, phone_no, department, created_at 
         FROM employees 
         WHERE username = ?1 AND password = ?2"
     )?;
@@ -62,7 +63,8 @@ pub fn authenticate_employee(username: String, password: String) -> Result<Emplo
             username: row.get(2)?,
             email: row.get(3)?,
             phone_no: row.get(4)?,
-            created_at: row.get(5)?,
+            department: row.get(5)?,
+            created_at: row.get(6)?,
         })
     })?;
 
@@ -74,23 +76,24 @@ pub fn authenticate_employee(username: String, password: String) -> Result<Emplo
 }
 
 #[tauri::command]
-pub fn authenticate_admin(username: String, password: String) -> Result<Employee, CustomError> {
+pub fn authenticate_admin(username: String, password: String) -> Result<Admin, CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
 
     let mut stmt = conn.prepare(
-        "SELECT employee_id, full_name, username, email, phone_no, created_at 
+        "SELECT admin_id, full_name, username, email, phone_no, department, created_at 
         FROM admins 
         WHERE username = ?1 AND password = ?2"
     )?;
 
     let mut user_iter = stmt.query_map(&[&username, &password], |row| {
-        Ok(Employee {
-            employee_id: row.get(0)?,
+        Ok(Admin {
+            admin_id: row.get(0)?,
             full_name: row.get(1)?,
             username: row.get(2)?,
             email: row.get(3)?,
             phone_no: row.get(4)?,
-            created_at: row.get(5)?,
+            department: row.get(5)?,
+            created_at: row.get(6)?,
         })
     })?;
 

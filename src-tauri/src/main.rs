@@ -3,8 +3,9 @@
 use notify_rust::Notification as DesktopNotification;
 use notify_rust::Timeout;
 
-mod auth_commands;
 mod initialize_app;
+mod auth_commands;
+mod user_commands;
 
 use crate::initialize_app::initialize_database;
 
@@ -39,7 +40,10 @@ fn main() {
                 auth_commands::get_departments,
                 auth_commands::create_employee,
                 auth_commands::authenticate_employee,
-                auth_commands::authenticate_admin
+                auth_commands::authenticate_admin,
+                user_commands::get_employee,
+                user_commands::get_admin,
+                user_commands::update_admin,
             ]
         )
         .run(tauri::generate_context!())

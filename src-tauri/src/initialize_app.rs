@@ -1,6 +1,7 @@
 use tauri::InvokeError;
 use rusqlite::Error as RusqliteError;
 use serde::Serialize;
+use serde::Deserialize;
 
 #[derive(Debug)]
 pub enum CustomError {
@@ -23,23 +24,25 @@ impl Into<InvokeError> for CustomError {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Employee {
     pub employee_id: i32,
     pub full_name: String,
     pub username: String,
     pub email: String,
     pub phone_no: String,
+    pub department: String,
     pub created_at: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Admin {
     pub admin_id: i32,
     pub full_name: String,
     pub username: String,
     pub email: String,
     pub phone_no: String,
+    pub department: String,
     pub created_at: String,
 }
 
@@ -80,7 +83,7 @@ pub fn initialize_database() -> Result<(), CustomError> {
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS admins (
-            employee_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            admin_id INTEGER PRIMARY KEY AUTOINCREMENT,
             full_name TEXT NOT NULL,
             username TEXT NOT NULL UNIQUE,
             email TEXT NOT NULL UNIQUE,
@@ -109,7 +112,7 @@ pub fn initialize_database() -> Result<(), CustomError> {
                 &format!("admin_{}", i),
                 &format!("admin_{}@company.com", i),
                 &format!("123456789{}", i),
-                &format!("{}","Password*2001"),
+                &format!("{}", "Password*2001"),
                 &format!("{}", department),
             ]
         )?;
