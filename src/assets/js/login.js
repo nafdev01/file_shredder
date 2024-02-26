@@ -14,11 +14,20 @@ employeeForm.addEventListener('submit', (event) => {
         username: employeeUsername,
         password: employeePassword,
     }).then(response => {
+        let employee = response;
+        loginEmployee(employee.employee_id, employee.username, employee.full_name);
         Swal.fire({
-            title: `Employee logged in successfully!`,
-            // text: JSON.stringify(response), // ensure response is a string
-            icon: 'success',
-            confirmButtonText: 'Ok'
+            title: `Welcome back ${employee.username}!`,
+            html: `Please wait while we log you in <b></b>`,
+            timer: 3000,
+            didOpen: () => {
+                Swal.showLoading();
+                Swal.getPopup().querySelector("b");
+            },
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.timer) {
+                window.location.href = 'employee-dashboard.html';
+            }
         });
     }
     ).catch(error => {
@@ -47,22 +56,31 @@ adminForm.addEventListener('submit', (event) => {
         username: adminUsername,
         password: adminPassword,
     }).then(response => {
+        let admin = response;
+        loginAdmin(admin.employee_id, admin.username, admin.full_name);
         Swal.fire({
-            title: `Admin logged in successfully!`,
-            // text: JSON.stringify(response), // ensure response is a string
-            icon: 'success',
-            confirmButtonText: 'Ok'
+            title: `Welcome back ${admin.username}!`,
+            html: `Please wait while we log you in <b></b>`,
+            timer: 3000,
+            didOpen: () => {
+                Swal.showLoading();
+                Swal.getPopup().querySelector("b");
+            },
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.timer) {
+                window.location.href = 'admin-dashboard.html';
+            }
         });
     }
     ).catch(error => {
-        // if the rror i lowercase is query retured no rows
+        // if the error is lowercase is query retured no rows
         if (error.toString().toLowerCase().includes('query returned no rows')) {
             errorMessage = 'Invalid admin username or password';
         }
 
         Swal.fire({
             title: 'Error!',
-            text: errorMessage, // ensure error is a string
+            text: error, // ensure error is a string
             icon: 'error',
             confirmButtonText: 'Ok'
         });

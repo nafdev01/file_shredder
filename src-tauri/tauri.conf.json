@@ -6,7 +6,7 @@
   },
   "package": {
     "productName": "file_shredder",
-    "version": "0.0.1"
+    "version": "0.0.3"
   },
   "tauri": {
     "allowlist": {
