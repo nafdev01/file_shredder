@@ -5,8 +5,8 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "file_shredder",
-    "version": "0.0.3"
+    "productName": "Shredder",
+    "version": "0.0.4"
   },
   "tauri": {
     "allowlist": {
