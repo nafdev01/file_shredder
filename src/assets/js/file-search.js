@@ -1,4 +1,19 @@
 try {
+    document.getElementById('file-search').addEventListener('keypress', function (event) {
+        if (event.keyCode == 13) {
+            event.preventDefault();
+            document.getElementById('search-button').click();
+        }
+    });
+} catch (error) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message
+    });
+}
+
+try {
     document.getElementById('search-button').addEventListener('click', () => {
         const pattern = document.getElementById('file-search').value;
 

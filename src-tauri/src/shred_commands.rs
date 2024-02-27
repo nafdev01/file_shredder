@@ -2,7 +2,6 @@ use walkdir::WalkDir;
 use regex::Regex;
 use tauri::command;
 use dirs;
-use tokio::task;
 
 #[command]
 pub async fn find_files(pattern: String) -> Vec<String> {
