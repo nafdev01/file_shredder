@@ -1,4 +1,22 @@
 try {
+    document.querySelector('#dir-button').addEventListener('click', function () {
+        window.__TAURI__.dialog.open({
+            directory: true,
+        }).then(directory => {
+            document.getElementById('dir-path').value = `${directory}`;
+        }).catch(error => {
+            console.error(error);
+        });
+    });
+} catch (error) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message
+    });
+}
+
+try {
     document.getElementById('file-search').addEventListener('keypress', function (event) {
         if (event.keyCode == 13) {
             event.preventDefault();
@@ -16,6 +34,7 @@ try {
 try {
     document.getElementById('search-button').addEventListener('click', () => {
         const pattern = document.getElementById('file-search').value;
+        const dir_path = document.getElementById('dir-path').value;
 
         // Show the loading spinner
         Swal.fire({
@@ -26,7 +45,7 @@ try {
             },
         });
 
-        window.__TAURI__.invoke('find_files', { pattern }).then(files => {
+        window.__TAURI__.invoke('find_files', { pattern, dir_path }).then(files => {
             const resultsContainer = document.getElementById('results-container');
             resultsContainer.innerHTML = '';
 

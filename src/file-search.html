@@ -223,19 +223,23 @@
                     <div class="col-md-8 col-sm-10">
                         <div class="app-card app-card-stat shadow-sm h-100">
                             <div class="app-card-body p-3 p-lg-4">
-                                <div class="input-group mb-3">
+                                <div class="form-group mb-3">
                                     <input type="text" class="form-control" placeholder="Search for a file"
                                         id="file-search">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button" id="search-button">
-                                            Search
-                                        </button>
-                                    </div>
                                     <div id="SearchHelpBlock" class="form-text">
-                                        Please note that the search functionality is designed to explore
-                                        your personal files exclusively.
+                                        Please note that the search functionality is designed to explore your personal
+                                        files exclusively.
                                     </div>
                                 </div>
+                                <div class="input-group mb-3">
+                                    <input type="text" id="dir-path" class="form-control" placeholder="Directory Path">
+                                    <button class="btn app-btn-primary" type="button" id="dir-button">
+                                        Select Directory
+                                    </button>
+                                </div>
+                                <button class="btn app-btn-dark" type="button" id="search-button">
+                                    Search
+                                </button>
                             </div>
                         </div>
                     </div>

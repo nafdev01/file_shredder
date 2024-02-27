@@ -13992,6 +13992,21 @@ button.close:focus {
     border-color: #18ba70
 }
 
+/* write the code for app button dark */
+
+.app-btn-dark {
+    background: #252930;
+    color: #fff;
+    border-color: #252930
+}
+
+.app-btn-dark:hover,
+.app-btn-dark:active {
+    color: #fff;
+    background: #2e3542;
+    border-color: #2e3542
+}
+
 .app-btn-secondary {
     background: #fff;
     color: #5d6778;
