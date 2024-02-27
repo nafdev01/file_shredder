@@ -1,4 +1,4 @@
-function confirmEmpoyeeLogout() {
+function confirmEmployeeLogout() {
     Swal.fire({
         title: "Warning!",
         text: "Are you sure you want to log out as an empoyee?",

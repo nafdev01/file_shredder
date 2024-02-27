@@ -6,6 +6,7 @@ use notify_rust::Timeout;
 mod initialize_app;
 mod auth_commands;
 mod user_commands;
+mod shred_commands;
 
 use crate::initialize_app::initialize_database;
 
@@ -42,7 +43,8 @@ fn main() {
                 auth_commands::authenticate_employee,
                 auth_commands::authenticate_admin,
                 user_commands::get_employee,
-                user_commands::get_admin
+                user_commands::get_admin,
+                shred_commands::find_files
             ]
         )
         .run(tauri::generate_context!())
