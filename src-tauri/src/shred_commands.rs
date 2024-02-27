@@ -2,9 +2,10 @@ use walkdir::WalkDir;
 use regex::Regex;
 use tauri::command;
 use dirs;
+use tokio::task;
 
 #[command]
-pub fn find_files(pattern: String) -> Vec<String> {
+pub async fn find_files(pattern: String) -> Vec<String> {
     let re = Regex::new(&pattern).unwrap();
     let mut files = Vec::new();
 
