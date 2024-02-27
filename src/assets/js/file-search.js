@@ -2,6 +2,7 @@ try {
     document.querySelector('#dir-button').addEventListener('click', function () {
         window.__TAURI__.dialog.open({
             directory: true,
+            defaultPath: document.getElementById('dir-path').value
         }).then(directory => {
             document.getElementById('dir-path').value = `${directory}`;
         }).catch(error => {
@@ -15,6 +16,7 @@ try {
         text: error.message
     });
 }
+
 
 try {
     document.getElementById('file-search').addEventListener('keypress', function (event) {
@@ -34,18 +36,19 @@ try {
 try {
     document.getElementById('search-button').addEventListener('click', () => {
         const pattern = document.getElementById('file-search').value;
-        const dir_path = document.getElementById('dir-path').value;
+        const directory = document.getElementById('dir-path').value;
 
         // Show the loading spinner
         Swal.fire({
-            title: 'Searching...',
-            allowOutsideClick: false,
-            onBeforeOpen: () => {
+            html: `<h3>Fetching files... <b></b></h3>`,
+            timer: 3000,
+            didOpen: () => {
                 Swal.showLoading();
+                Swal.getPopup().querySelector("b");
             },
-        });
+        })
 
-        window.__TAURI__.invoke('find_files', { pattern, dir_path }).then(files => {
+        window.__TAURI__.invoke('find_files', { pattern: pattern, directory: directory }).then(files => {
             const resultsContainer = document.getElementById('results-container');
             resultsContainer.innerHTML = '';
 
@@ -71,12 +74,17 @@ try {
 
             // Close the loading spinner
             Swal.close();
+        }).catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: error,
+            });
         });
     });
 } catch (error) {
+    // output the error
     Swal.fire({
         icon: 'error',
-        title: 'Error',
-        text: error.message
+        title: error.message
     });
 }
