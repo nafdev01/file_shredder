@@ -7,21 +7,13 @@ mod initialize_app;
 mod auth_commands;
 mod user_commands;
 mod shred_commands;
+mod shredder_functions;
 
 use crate::initialize_app::initialize_database;
 
 fn main() {
     match initialize_database() {
         Ok(_) => {
-            DesktopNotification::new()
-                .summary("File Shredder Database Initialized!")
-                .body(
-                    "The tables and data for the File Shredder application have been initialized successfully."
-                )
-                .icon("32x32")
-                .timeout(Timeout::Milliseconds(6000)) //milliseconds
-                .show()
-                .unwrap();
         }
         Err(_e) => {
             DesktopNotification::new()
@@ -44,6 +36,7 @@ fn main() {
                 auth_commands::authenticate_admin,
                 user_commands::get_employee,
                 user_commands::get_admin,
+                user_commands::update_employee,
                 shred_commands::find_files
             ]
         )

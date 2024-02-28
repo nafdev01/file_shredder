@@ -1,10 +1,15 @@
+const invoke = window.__TAURI__.invoke
+const notification = window.__TAURI__.notification
+const dialog = window.__TAURI__.dialog
+
 try {
     document.querySelector('#dir-button').addEventListener('click', function () {
-        window.__TAURI__.dialog.open({
+        dialog.open({
             directory: true,
             defaultPath: document.getElementById('dir-path').value
         }).then(directory => {
             document.getElementById('dir-path').value = `${directory}`;
+            document.getElementById('searcher').value = `${localStorage.getItem('employeeUsername')}`;
         }).catch(error => {
             console.error(error);
         });
@@ -37,6 +42,11 @@ try {
     document.getElementById('search-button').addEventListener('click', () => {
         const pattern = document.getElementById('file-search').value;
         const directory = document.getElementById('dir-path').value;
+        const userName = document.getElementById('searcher').value;
+
+        notification.sendNotification({
+            title: `Username is ${userName}!`,
+        });
 
         // Show the loading spinner
         Swal.fire({
@@ -48,7 +58,7 @@ try {
             },
         })
 
-        window.__TAURI__.invoke('find_files', { pattern: pattern, directory: directory }).then(files => {
+        window.__TAURI__.invoke('find_files', { pattern: pattern, directory: directory, searchedBy: userName }).then(files => {
             const resultsContainer = document.getElementById('results-container');
             resultsContainer.innerHTML = '';
 

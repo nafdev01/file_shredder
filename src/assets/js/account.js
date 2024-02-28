@@ -21,9 +21,9 @@ if (isAdminLoggedIn()) {
         username: adminUsername,
     }).then(response => {
         let admin = response;
-        adminName = admin.full_name;
+        adminName = admin.fullname;
         adminEmail = admin.email;
-        adminPhoneNo = admin.phone_no;
+        adminPhoneNo = admin.phone;
         adminDepartment = admin.department;
 
         // set the values of the HTML elements
@@ -54,6 +54,8 @@ if (isEmployeeLoggedIn()) {
     const employeeId = localStorage.getItem('employeeId');
     const employeeUsername = localStorage.getItem('employeeUsername');
 
+    const employeeProfileForm = document.querySelector('#employee-profile-form');
+
     const employeeUsernameInput = document.getElementById('employee-username-input');
     const employeeNameInput = document.getElementById('employee-name-input')
     const employeeEmailInput = document.getElementById('employee-email-input')
@@ -69,30 +71,69 @@ if (isEmployeeLoggedIn()) {
         username: employeeUsername,
     }).then(response => {
         let employee = response;
-        employeeName = employee.full_name;
-        employeeEmail = employee.email;
-        employeePhoneNo = employee.phone_no;
-        employeeDepartment = employee.department;
 
         // set the values of the HTML elements
         document.getElementById('employee-username').innerHTML = `@${employeeUsername}`;
-        document.getElementById('employee-name').innerHTML = employeeName;
-        document.getElementById('employee-email').innerHTML = employeeEmail;
-        document.getElementById('employee-phone-no').innerHTML = employeePhoneNo;
-        document.getElementById('employee-department').innerHTML = employeeDepartment;
+        document.getElementById('employee-name').innerHTML = employee.fullname;
+        document.getElementById('employee-email').innerHTML = employee.email;
+        document.getElementById('employee-phone-no').innerHTML = employee.phone;
+        document.getElementById('employee-department').innerHTML = employee.department;
 
         // set the values for the input elements
         employeeUsernameInput.value = employeeUsername;
-        employeeNameInput.value = employeeName;
-        employeeEmailInput.value = employeeEmail;
-        employeePhoneNoInput.value = employeePhoneNo;
+        employeeNameInput.value = employee.fullname;
+        employeeEmailInput.value = employee.email;
+        employeePhoneNoInput.value = employee.phone;
     }
     ).catch(error => {
         notification.sendNotification({
             title: `Error!`,
             body: `${error}`, // ensure error is a string
         });
-
     })
 
+    // add update user fuctionality
+    employeeProfileForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const employeeUsername = employeeUsernameInput.value;
+        const employeeName = employeeNameInput.value;
+        const employeeEmail = employeeEmailInput.value;
+        const employeePhoneNo = employeePhoneNoInput.value;
+
+        invoke('update_employee', {
+            employeeid: employeeId,
+            username: employeeUsername,
+            fullname: employeeName,
+            email: employeeEmail,
+            phone: employeePhoneNo,
+        }).then(response => {
+            updateEmployeeSessionDetails(employeeId, employeeUsername, employeeName)
+            Swal.fire({
+                title: `Update successful!`,
+                html: `Please wait while we apply the requested changes to your profile <b></b>`,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                timer: 3000,
+                didOpen: () => {
+                    Swal.showLoading();
+                    Swal.getPopup().querySelector("b");
+                },
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    window.location.href = 'employee-account.html';
+                }
+            });
+        }
+        ).catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops!',
+                text: `${error}`,
+            })
+
+        })
+    });
+
+
+    // add change password fuctionality
 }

@@ -47,3 +47,8 @@ function updateAdminSessionDetails(adminId, adminUsername, adminFullName) {
     localStorage.setItem('adminUsername', `${adminUsername}`);
     localStorage.setItem('adminName', `${adminFullName}`);
 }
+function updateEmployeeSessionDetails(employeeId, employeeUsername, employeeFullName) {
+    localStorage.setItem('employeeId', `${employeeId}`);
+    localStorage.setItem('employeeUsername', `${employeeUsername}`);
+    localStorage.setItem('employeeName', `${employeeFullName}`);
+}

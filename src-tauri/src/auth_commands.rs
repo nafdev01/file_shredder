@@ -29,18 +29,18 @@ pub fn get_departments() -> Result<Vec<Department>, CustomError> {
 
 #[tauri::command]
 pub fn create_employee(
-    full_name: String,
+    fullname: String,
     username: String,
     email: String,
-    phone_no: String,
+    phone: String,
     department: String,
     password: String
 ) -> Result<(), CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
 
     conn.execute(
-        "INSERT INTO employees (full_name, username, email, phone_no, department, password) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
-        &[&full_name, &username, &email, &phone_no, &department, &password]
+        "INSERT INTO employees (fullname, username, email, phone, department, password) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        &[&fullname, &username, &email, &phone, &department, &password]
     )?;
 
     Ok(())
@@ -51,18 +51,18 @@ pub fn authenticate_employee(username: String, password: String) -> Result<Emplo
     let conn = rusqlite::Connection::open("shredder.db")?;
 
     let mut stmt = conn.prepare(
-        "SELECT employee_id, full_name, username, email, phone_no, department, created_at 
+        "SELECT employeeid, fullname, username, email, phone, department, created_at 
         FROM employees 
         WHERE username = ?1 AND password = ?2"
     )?;
 
     let mut user_iter = stmt.query_map(&[&username, &password], |row| {
         Ok(Employee {
-            employee_id: row.get(0)?,
-            full_name: row.get(1)?,
+            employeeid: row.get(0)?,
+            fullname: row.get(1)?,
             username: row.get(2)?,
             email: row.get(3)?,
-            phone_no: row.get(4)?,
+            phone: row.get(4)?,
             department: row.get(5)?,
             created_at: row.get(6)?,
         })
@@ -80,18 +80,18 @@ pub fn authenticate_admin(username: String, password: String) -> Result<Admin, C
     let conn = rusqlite::Connection::open("shredder.db")?;
 
     let mut stmt = conn.prepare(
-        "SELECT admin_id, full_name, username, email, phone_no, department, created_at 
+        "SELECT adminid, fullname, username, email, phone, department, created_at 
         FROM admins 
         WHERE username = ?1 AND password = ?2"
     )?;
 
     let mut user_iter = stmt.query_map(&[&username, &password], |row| {
         Ok(Admin {
-            admin_id: row.get(0)?,
-            full_name: row.get(1)?,
+            adminid: row.get(0)?,
+            fullname: row.get(1)?,
             username: row.get(2)?,
             email: row.get(3)?,
-            phone_no: row.get(4)?,
+            phone: row.get(4)?,
             department: row.get(5)?,
             created_at: row.get(6)?,
         })

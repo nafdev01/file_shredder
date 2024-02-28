@@ -1,6 +1,7 @@
 // initialize the tauri API for invoking the rust functions and sending desktop notifications
 const invoke = window.__TAURI__.invoke
 const notification = window.__TAURI__.notification
+const dialog = window.__TAURI__.dialog
 
 // Regular expressions for validating user input
 const usernamePattern = /^.{6,}$/;
@@ -8,7 +9,7 @@ const phonePattern = /^\d{10}$/;
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$*]).{8,}$/;
 
 // intialized the signup form
-const employee_form = document.querySelector('#employee-signup-form');
+const employeeForm = document.querySelector('#employee-signup-form');
 
 // add functionality to the checkbox to enable the submit button
 function checkAgreement(agreeCheckbox) {
@@ -19,7 +20,7 @@ function checkAgreement(agreeCheckbox) {
     }
 }
 
-employee_form.addEventListener('submit', (event) => {
+employeeForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
     const employeeFullName = document.querySelector('#employee-signup-name').value;
@@ -81,24 +82,32 @@ employee_form.addEventListener('submit', (event) => {
 
 
     invoke('create_employee', {
-        fullName: employeeFullName,
+        fullname: employeeFullName,
         username: employeeUsername,
         email: employeeEmail,
-        phoneNo: employeePhoneNo,
+        phone: employeePhoneNo,
         department: employeeDepartment,
         password: employeePassword,
     }).then(response => {
         Swal.fire({
-            title: `User created successfully!`,
-            text: response,
-            icon: 'success',
-            confirmButtonText: 'Ok'
+            title: "Signup Successful!",
+            text: "Do you want to login now?",
+            showDenyButton: true,
+            showCancelButton: false,
+            confirmButtonText: `Yes`,
+            denyButtonText: `No`,
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                window.location.href = "login.html";
+            } else if (result.isDenied) {
+                employeeForm.reset();
+            }
         });
-        employee_form.reset();
     }
     ).catch(error => {
         // if error occurs output appropriate error message
-        if (error.toString() === "UNIQUE constraint failed: employees.phone_no") {
+        if (error.toString() === "UNIQUE constraint failed: employees.phone") {
             errorMessage = "Phone number already used by another user";
         } else if (error.toString() === "UNIQUE constraint failed: employees.email") {
             errorMessage = "Email already used by another user";

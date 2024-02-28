@@ -26,22 +26,22 @@ impl Into<InvokeError> for CustomError {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Employee {
-    pub employee_id: i32,
-    pub full_name: String,
+    pub employeeid: i32,
+    pub fullname: String,
     pub username: String,
     pub email: String,
-    pub phone_no: String,
+    pub phone: String,
     pub department: String,
     pub created_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Admin {
-    pub admin_id: i32,
-    pub full_name: String,
+    pub adminid: i32,
+    pub fullname: String,
     pub username: String,
     pub email: String,
-    pub phone_no: String,
+    pub phone: String,
     pub department: String,
     pub created_at: String,
 }
@@ -68,11 +68,11 @@ pub fn initialize_database() -> Result<(), CustomError> {
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS employees (
-            employee_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT NOT NULL,
+            employeeid INTEGER PRIMARY KEY AUTOINCREMENT,
+            fullname TEXT NOT NULL,
             username TEXT NOT NULL UNIQUE,
             email TEXT NOT NULL UNIQUE,
-            phone_no TEXT UNIQUE,
+            phone TEXT UNIQUE,
             password TEXT NOT NULL,
             department TEXT NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -83,11 +83,11 @@ pub fn initialize_database() -> Result<(), CustomError> {
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS admins (
-            admin_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT NOT NULL,
+            adminid INTEGER PRIMARY KEY AUTOINCREMENT,
+            fullname TEXT NOT NULL,
             username TEXT NOT NULL UNIQUE,
             email TEXT NOT NULL UNIQUE,
-            phone_no TEXT NOT NULL UNIQUE,
+            phone TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             department TEXT NOT NULL UNIQUE,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -102,11 +102,24 @@ pub fn initialize_database() -> Result<(), CustomError> {
         &["Human Resources", "Finance", "Marketing", "Sales", "Operations"]
     )?;
 
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS searches (
+            search_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            searcher TEXT NOT NULL,
+            word TEXT NOT NULL,
+            directory TEXT NOT NULL,
+            no_of_files INTEGER NOT NULL,
+            searched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (searcher) REFERENCES employees(username)
+        );",
+        []
+    )?;
+
     // add some default admins for each department
     let departments = ["Human Resources", "Finance", "Marketing", "Sales", "Operations"];
     for (i, department) in departments.iter().enumerate() {
         conn.execute(
-            "INSERT OR IGNORE INTO admins (full_name, username, email, phone_no, password, department) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+            "INSERT OR IGNORE INTO admins (fullname, username, email, phone, password, department) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
             &[
                 &format!("Default Admin {}", department),
                 &format!("admin_{}", i),

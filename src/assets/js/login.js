@@ -15,7 +15,7 @@ employeeForm.addEventListener('submit', (event) => {
         password: employeePassword,
     }).then(response => {
         let employee = response;
-        loginEmployee(employee.employee_id, employee.username, employee.full_name);
+        loginEmployee(employee.employeeid, employee.username, employee.fullname);
         Swal.fire({
             title: `Welcome back ${employee.username}!`,
             html: `Please wait while we log you in <b></b>`,
@@ -57,7 +57,7 @@ adminForm.addEventListener('submit', (event) => {
         password: adminPassword,
     }).then(response => {
         let admin = response;
-        loginAdmin(admin.admin_id, admin.username, admin.full_name);
+        loginAdmin(admin.adminid, admin.username, admin.fullname);
         Swal.fire({
             title: `Welcome back ${admin.username}!`,
             html: `Please wait while we log you in <b></b>`,

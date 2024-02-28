@@ -1,24 +1,24 @@
+use crate::initialize_app::Admin;
 use crate::initialize_app::CustomError;
 use crate::initialize_app::Employee;
-use crate::initialize_app::Admin;
 
 #[tauri::command]
 pub fn get_employee(username: String) -> Result<Employee, CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
 
     let mut stmt = conn.prepare(
-        "SELECT employee_id, full_name, username, email, phone_no, department, created_at 
+        "SELECT employeeid, fullname, username, email, phone, department, created_at 
         FROM employees 
-        WHERE username = ?1"
+        WHERE username = ?1",
     )?;
 
     let mut user_iter = stmt.query_map(&[&username], |row| {
         Ok(Employee {
-            employee_id: row.get(0)?,
-            full_name: row.get(1)?,
+            employeeid: row.get(0)?,
+            fullname: row.get(1)?,
             username: row.get(2)?,
             email: row.get(3)?,
-            phone_no: row.get(4)?,
+            phone: row.get(4)?,
             department: row.get(5)?,
             created_at: row.get(6)?,
         })
@@ -27,7 +27,9 @@ pub fn get_employee(username: String) -> Result<Employee, CustomError> {
     if let Some(user) = user_iter.next() {
         Ok(user?)
     } else {
-        Err(CustomError::DatabaseError(rusqlite::Error::QueryReturnedNoRows))
+        Err(CustomError::DatabaseError(
+            rusqlite::Error::QueryReturnedNoRows,
+        ))
     }
 }
 
@@ -36,18 +38,18 @@ pub fn get_admin(username: String) -> Result<Admin, CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
 
     let mut stmt = conn.prepare(
-        "SELECT admin_id, full_name, username, email, phone_no, department, created_at 
+        "SELECT adminid, fullname, username, email, phone, department, created_at 
         FROM admins 
-        WHERE username = ?1"
+        WHERE username = ?1",
     )?;
 
     let mut user_iter = stmt.query_map(&[&username], |row| {
         Ok(Admin {
-            admin_id: row.get(0)?,
-            full_name: row.get(1)?,
+            adminid: row.get(0)?,
+            fullname: row.get(1)?,
             username: row.get(2)?,
             email: row.get(3)?,
-            phone_no: row.get(4)?,
+            phone: row.get(4)?,
             department: row.get(5)?,
             created_at: row.get(6)?,
         })
@@ -56,6 +58,28 @@ pub fn get_admin(username: String) -> Result<Admin, CustomError> {
     if let Some(user) = user_iter.next() {
         Ok(user?)
     } else {
-        Err(CustomError::DatabaseError(rusqlite::Error::QueryReturnedNoRows))
+        Err(CustomError::DatabaseError(
+            rusqlite::Error::QueryReturnedNoRows,
+        ))
     }
+}
+
+#[tauri::command]
+pub fn update_employee(
+    employeeid: String,
+    fullname: String,
+    username: String,
+    email: String,
+    phone: String,
+) -> Result<(), CustomError> {
+    let conn = rusqlite::Connection::open("shredder.db")?;
+
+    conn.execute(
+        "UPDATE employees 
+        SET fullname = ?1, username = ?2, email = ?3, phone = ?4
+        WHERE employeeid = ?5",
+        &[&fullname, &username, &email, &phone, &employeeid],
+    )?;
+
+    Ok(())
 }
