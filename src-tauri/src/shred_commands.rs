@@ -4,9 +4,8 @@ use crate::shredder_functions::log_search;
 use notify_rust::Notification as DesktopNotification;
 use regex::Regex;
 use rusqlite::{params, Connection};
-use walkdir::WalkDir;
 use std::sync::Arc;
-
+use walkdir::WalkDir;
 
 #[tauri::command]
 pub async fn find_files(pattern: String, directory: String, searcher: String) -> Vec<String> {
@@ -102,12 +101,12 @@ pub fn create_shred_request(requestby: String, filepath: String) -> Result<Strin
 }
 
 #[tauri::command]
-pub fn get_shred_requests(requestto: String) -> Result<Vec<ShredRequest>, CustomError> {
+pub fn get_pending_shred_requests(requestto: String) -> Result<Vec<ShredRequest>, CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
 
     let mut stmt = conn.prepare(
         "SELECT requestid, requestby, filepath, department, requeststatus, requestat from shredrequests 
-        WHERE requestto = ?1",
+        WHERE requestto = ?1 and requeststatus = 'Pending'",
     )?;
 
     let requestadmin = Arc::new(requestto.clone());
@@ -131,4 +130,86 @@ pub fn get_shred_requests(requestto: String) -> Result<Vec<ShredRequest>, Custom
     }
 
     Ok(shredrequests)
+}
+
+#[tauri::command]
+pub fn get_denied_shred_requests(requestto: String) -> Result<Vec<ShredRequest>, CustomError> {
+    let conn = rusqlite::Connection::open("shredder.db")?;
+
+    let mut stmt = conn.prepare(
+        "SELECT requestid, requestby, filepath, department, requeststatus, requestat from shredrequests 
+        WHERE requestto = ?1 and requeststatus = 'Denied'",
+    )?;
+
+    let requestadmin = Arc::new(requestto.clone());
+
+    let shred_request_iter = stmt.query_map(&[&requestto], |row| {
+        let requestadmin = Arc::clone(&requestadmin);
+        Ok(ShredRequest {
+            requestid: row.get(0)?,
+            requestby: row.get(1)?,
+            filepath: row.get(2)?,
+            department: row.get(3)?,
+            requestto: (*requestadmin).clone(),
+            requeststatus: row.get(4)?,
+            requestat: row.get(5)?,
+        })
+    })?;
+
+    let mut shredrequests = Vec::new();
+    for shredrequest in shred_request_iter {
+        shredrequests.push(shredrequest?);
+    }
+
+    Ok(shredrequests)
+}
+
+#[tauri::command]
+pub fn get_approved_shred_requests(requestto: String) -> Result<Vec<ShredRequest>, CustomError> {
+    let conn = rusqlite::Connection::open("shredder.db")?;
+
+    let mut stmt = conn.prepare(
+        "SELECT requestid, requestby, filepath, department, requeststatus, requestat from shredrequests 
+        WHERE requestto = ?1 and requeststatus = 'Approved'",
+    )?;
+
+    let requestadmin = Arc::new(requestto.clone());
+
+    let shred_request_iter = stmt.query_map(&[&requestto], |row| {
+        let requestadmin = Arc::clone(&requestadmin);
+        Ok(ShredRequest {
+            requestid: row.get(0)?,
+            requestby: row.get(1)?,
+            filepath: row.get(2)?,
+            department: row.get(3)?,
+            requestto: (*requestadmin).clone(),
+            requeststatus: row.get(4)?,
+            requestat: row.get(5)?,
+        })
+    })?;
+
+    let mut shredrequests = Vec::new();
+    for shredrequest in shred_request_iter {
+        shredrequests.push(shredrequest?);
+    }
+
+    Ok(shredrequests)
+}
+
+#[tauri::command]
+pub fn update_shred_request(requestid: String, requeststatus: String) -> Result<String, String> {
+    let conn = match Connection::open("shredder.db") {
+        Ok(conn) => conn,
+        Err(e) => return Err(format!("Failed to open database: {}", e)),
+    };
+
+    let res = conn.execute(
+        "UPDATE shredrequests SET requeststatus = ?1 WHERE requestid = ?2",
+        params![requeststatus, requestid],
+    );
+
+    match res {
+        Ok(_) => Ok("Shred request updated successfully".to_string()),
+        Err(e) => Err(format!("Failed to update shred request: {}", e)),
+    }
 }

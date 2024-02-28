@@ -90,11 +90,39 @@
 								&nbsp;<span class="nav-link-text">Dashboard</span>
 							</a>
 						</li>
-						<li class="nav-item">
-							<a class="nav-link active" href="review_shred_requests.html">
-								<i class="fas fa-file-alt fa-lg"></i>
-								&nbsp;<span class="nav-link-text">Shred Requests</span>
+						<li class="nav-item has-submenu">
+							<a class="nav-link submenu-toggle active" href="#" data-bs-toggle="collapse"
+								data-bs-target="#submenu-1" aria-expanded="false" aria-controls="submenu-1">
+								<span class="nav-icon">
+									<i class="fas fa-search fa-xl"></i>
+								</span>
+								<span class="nav-link-text">Shred Requests</span>
+								<span class="submenu-arrow">
+									<i class="fas fa-chevron-down"></i>
+								</span>
 							</a>
+							<div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
+								<ul class="submenu-list list-unstyled">
+									<li class="submenu-item">
+										<a class="submenu-link" href="pending_shred_requests.html">
+											<i class="far fa-pause-circle fa-lg"></i>
+											&nbsp;<span>Pending</span>
+										</a>
+									</li>
+									<li class="submenu-item">
+										<a class="submenu-link" href="approved_shred_requests.html">
+											<i class="far fa-check-circle fa-lg"></i>
+											&nbsp;<span>Approved</span>
+										</a>
+									</li>
+									<li class="submenu-item">
+										<a class="submenu-link active" href="denied_shred_requests.html">
+											<i class="far fa-times-circle fa-lg"></i>
+											<span>&nbsp;Denied</span>
+										</a>
+									</li>
+								</ul>
+							</div>
 						</li>
 					</ul>
 				</nav>
@@ -104,10 +132,12 @@
 
 	<div class="app-wrapper">
 
+		<input type="hidden" id="search-type" value="denied">
+
 		<div class="app-content pt-3 p-md-3 p-lg-4">
 			<div class="container-xl min-vh-100">
 
-				<h1 class="app-page-title">Review Shred Requests</h1>
+				<h1 class="app-page-title">Denied Shred Requests</h1>
 
 				<div class="row g-4 mb-4">
 					<div class="col-12">
@@ -164,7 +194,6 @@
 			});
 			window.location.href = 'login.html';
 		}
-		document.getElementById('welcome-card').innerHTML = `Welcome, ${localStorage.getItem('adminName')}`;
 	</script>
 
 </body>

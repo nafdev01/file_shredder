@@ -5,8 +5,19 @@ const dialog = window.__TAURI__.dialog
 if (localStorage.getItem('adminId')) {
     const adminId = localStorage.getItem('adminId');
 
+    const searchType = document.getElementById('search-type').value;
+
     try {
-        invoke('get_shred_requests', { requestto: adminId }).then(shredRequests => {
+        invoke(`get_${searchType}_shred_requests`, { requestto: adminId }).then(shredRequests => {
+            if (shredRequests.length === 0) {
+                document.getElementById('shred-request-table').innerHTML = `
+                    <div class="alert alert-info" role="alert">
+                        <p class="h4">No ${searchType} shred requests.</p<>
+                    </div>
+                `;
+                return;
+            }
+
             const shredRequestTable = document.getElementById('shred-request-table');
             let tableContent = `
                 <thead>
@@ -23,12 +34,21 @@ if (localStorage.getItem('adminId')) {
             `;
 
             shredRequests.forEach(shredRequest => {
+                if (shredRequest.requeststatus === "Approved") {
+                    var statusIcon = `<i class="far fa-thumbs-up fa-2xl" style="color: #029705;"></i>`
+                } else if (shredRequest.requeststatus === "Denied") {
+                    var statusIcon = `<i class="far fa-thumbs-down fa-2xl" style="color: #ea0606;"></i>`
+                } else if (shredRequest.requeststatus === "Pending") {
+                    var statusIcon = `<i class="far fa-thumbs-up fa-2xl" style="color: #029705;"></i>`
+                }
+
+
                 tableContent += `
                     <tr>
                         <td>${shredRequest.requestby}</td>
                         <td>${shredRequest.filepath}</td>
                         <td>${shredRequest.department}</td>
-                        <td>${shredRequest.requeststatus}</td>
+                        <td>${statusIcon}</td>
                         <td>${shredRequest.requestat}</td>
                         <td>
                         <div class="dropdown">
@@ -37,10 +57,10 @@ if (localStorage.getItem('adminId')) {
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="actionsDropdown${shredRequest.requestid}">
                             <li>
-                                <button class="dropdown-item btn" data-btn="${shredRequest.filepath}" onclick="approveShredRequest(this)">Approve</button>
+                                <button class="dropdown-item btn" data-file="${shredRequest.filepath}" data-file-id="${shredRequest.requestid}" onclick="approveShredRequest(this)">Approve</button>
                             </li>
                             <li>
-                                <button class="dropdown-item btn" data-btn="${shredRequest.filepath}" onclick="denyShredRequest(this)">Deny</button>
+                                <button class="dropdown-item btn" data-file="${shredRequest.filepath}" data-file-id="${shredRequest.requestid}" onclick="denyShredRequest(this)">Deny</button>
                             </li>
                         </ul>
                       </div>
@@ -60,7 +80,8 @@ if (localStorage.getItem('adminId')) {
 
 
 function approveShredRequest(approvebutton) {
-    const filepath = approvebutton.getAttribute('data-btn');
+    const filepath = approvebutton.getAttribute('data-file');
+    const fileId = approvebutton.getAttribute('data-file-id');
 
     Swal.fire({
         title: 'Are you sure?',
@@ -69,12 +90,40 @@ function approveShredRequest(approvebutton) {
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Approve'
+        confirmButtonText: 'Approve',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            invoke('update_shred_request', { requestid: fileId, requeststatus: "Approved" }).then(response => {
+                if (response) {
+                    Swal.fire({
+                        title: 'Approved!',
+                        text: `The shred request for the file: ${filepath} has been approved.`,
+                        icon: 'success'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Failed!',
+                        text: `The shred request for the file: ${filepath} could not be approved.`,
+                        icon: 'error'
+                    });
+                }
+            }).catch(error => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: `${error}`,
+                    icon: 'success'
+                });
+            });
+        }
     });
 }
 
 function denyShredRequest(denyButton) {
-    const filepath = denyButton.getAttribute('data-btn');
+    const filepath = denyButton.getAttribute('data-file');
+    const fileId = denyButton.getAttribute('data-file-id');
 
     Swal.fire({
         title: 'Are you sure?',
@@ -83,6 +132,33 @@ function denyShredRequest(denyButton) {
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Deny'
+        confirmButtonText: 'Deny',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            invoke('update_shred_request', { requestid: fileId, requeststatus: "Denied" }).then(response => {
+                if (response) {
+                    Swal.fire({
+                        title: 'Denied!',
+                        text: `The shred request for the file: ${filepath} has been denied.`,
+                        icon: 'success'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Failed!',
+                        text: `The shred request for the file: ${filepath} could not be denied.`,
+                        icon: 'error'
+                    });
+                }
+            }).catch(error => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: `${error}`,
+                    icon: 'success'
+                });
+            });
+        }
     });
 }
