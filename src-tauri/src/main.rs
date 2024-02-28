@@ -37,7 +37,10 @@ fn main() {
                 user_commands::get_employee,
                 user_commands::get_admin,
                 user_commands::update_employee,
-                shred_commands::find_files
+                user_commands::update_admin,
+                user_commands::change_employee_password,
+                user_commands::change_admin_password,
+                shred_commands::find_files,
             ]
         )
         .run(tauri::generate_context!())

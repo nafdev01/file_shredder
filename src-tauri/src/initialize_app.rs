@@ -1,11 +1,12 @@
-use tauri::InvokeError;
 use rusqlite::Error as RusqliteError;
-use serde::Serialize;
 use serde::Deserialize;
+use serde::Serialize;
+use tauri::InvokeError;
 
 #[derive(Debug)]
 pub enum CustomError {
     DatabaseError(RusqliteError),
+    PasswordMismatch(String),
     // Add other kinds of errors as needed
 }
 
@@ -19,6 +20,7 @@ impl Into<InvokeError> for CustomError {
     fn into(self) -> InvokeError {
         match self {
             CustomError::DatabaseError(err) => InvokeError::from(err.to_string()),
+            CustomError::PasswordMismatch(err) => InvokeError::from(err),
             // Handle other kinds of errors as needed
         }
     }
@@ -63,7 +65,7 @@ pub fn initialize_database() -> Result<(), CustomError> {
             department_name TEXT NOT NULL UNIQUE,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );",
-        []
+        [],
     )?;
 
     conn.execute(
@@ -78,7 +80,7 @@ pub fn initialize_database() -> Result<(), CustomError> {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (department) REFERENCES departments(department_name)
         );",
-        []
+        [],
     )?;
 
     conn.execute(
@@ -93,13 +95,19 @@ pub fn initialize_database() -> Result<(), CustomError> {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (department) REFERENCES departments(department_name)
         );",
-        []
+        [],
     )?;
 
     // add some initial data to the departments table
     conn.execute(
         "INSERT OR IGNORE INTO departments (department_name) VALUES (?1), (?2), (?3), (?4), (?5)",
-        &["Human Resources", "Finance", "Marketing", "Sales", "Operations"]
+        &[
+            "Human Resources",
+            "Finance",
+            "Marketing",
+            "Sales",
+            "Operations",
+        ],
     )?;
 
     conn.execute(
@@ -112,11 +120,17 @@ pub fn initialize_database() -> Result<(), CustomError> {
             searched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (searcher) REFERENCES employees(username)
         );",
-        []
+        [],
     )?;
 
     // add some default admins for each department
-    let departments = ["Human Resources", "Finance", "Marketing", "Sales", "Operations"];
+    let departments = [
+        "Human Resources",
+        "Finance",
+        "Marketing",
+        "Sales",
+        "Operations",
+    ];
     for (i, department) in departments.iter().enumerate() {
         conn.execute(
             "INSERT OR IGNORE INTO admins (fullname, username, email, phone, password, department) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",

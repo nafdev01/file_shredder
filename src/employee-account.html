@@ -296,7 +296,7 @@
 						</div>
 					</div>
 
-					<!-- Manage Security Modal -->
+					<!-- Manage Profile Modal -->
 					<div class="modal fade" id="manageProfileModal" tabindex="-1"
 						aria-labelledby="manageProfileModalLabel" aria-hidden="true">
 						<div class="modal-dialog">
@@ -353,6 +353,59 @@
 						</div>
 					</div>
 
+					<!-- Manage Security Modal -->
+					<div class="modal fade" id="changePasswordModal" tabindex="-1"
+						aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h1 class="modal-title fs-5 text-center" id="changePasswordModalLabel">
+										Change Password
+									</h1>
+									<button type="button" class="btn-close" data-bs-dismiss="modal"
+										aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form method="post" id="employee-change-password-form"
+										onsubmit="changePassword(this)">
+
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="old-password-addon">
+												<i class="fas fa-key"></i>
+											</span>
+											<input type="password" class="form-control" placeholder="Enter Old Password"
+												aria-label="Enter Old Password" aria-describedby="old-password-addon"
+												id="employee-old-password-input" name="employee-old-password">
+										</div>
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="new-password-addon">
+												<i class="fas fa-lock"></i>
+											</span>
+											<input type="password" class="form-control" placeholder="Enter New Password"
+												aria-label="Enter New Password" aria-describedby="new-password-addon"
+												id="employee-new-password-input" name="employee-new-password">
+										</div>
+										<div class="input-group mb-3">
+											<span class="input-group-text" id="confirm-new-password-addon">
+												<i class="fas fa-check"></i>
+											</span>
+											<input type="password" class="form-control" placeholder="Confirm New Password"
+												aria-label="Confirm New Password" aria-describedby="confirm-new-password-addon"
+												id="employee-confirm-new-password-input" name="employee-confirm-new-password">
+										</div>
+
+										<div class="d-flex justify-content-evenly">
+											<button type="submit" class="btn btn-warning">Update Profile</button>
+											<button type="button" class="btn btn-secondary"
+												data-bs-dismiss="modal">Cancel</button>
+										</div>
+									</form>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
 					<div class="col-12 col-lg-6">
 						<div class="app-card app-card-account shadow-sm d-flex flex-column align-items-start">
 							<div class="app-card-header p-3 border-bottom-0">
@@ -382,7 +435,10 @@
 							</div>
 
 							<div class="app-card-footer p-4 mt-auto">
-								<a class="btn app-btn-secondary" href="#">Manage Security</a>
+								<button type="button" class="btn app-btn-secondary" data-bs-toggle="modal"
+									data-bs-target="#changePasswordModal">
+									Manage Security
+								</button>
 							</div>
 						</div>
 					</div>
