@@ -2,7 +2,6 @@ use crate::shredder_functions::log_search;
 use notify_rust::Notification as DesktopNotification;
 use regex::Regex;
 use walkdir::WalkDir;
-
 #[tauri::command]
 pub async fn find_files(pattern: String, directory: String, searcher: String) -> Vec<String> {
     let re = Regex::new(&pattern).unwrap();
@@ -21,11 +20,18 @@ pub async fn find_files(pattern: String, directory: String, searcher: String) ->
         }
     }
 
-    match log_search(searcher, pattern, directory, files.len() as i32) {
+    let num_results = files.len() as i32;
+    let search_term = pattern.clone();
+    let directory_searched = directory.clone();
+
+    match log_search(searcher, pattern, directory, num_results) {
         Ok(_) => {
             DesktopNotification::new()
                 .summary("Shredder")
-                .body("Search complete")
+                .body(&format!(
+                    "Your search for {} in {} returned {} results",
+                    search_term, directory_searched, num_results
+                ))
                 .show()
                 .unwrap();
         }

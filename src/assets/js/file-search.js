@@ -9,7 +9,6 @@ try {
             defaultPath: document.getElementById('dir-path').value
         }).then(directory => {
             document.getElementById('dir-path').value = `${directory}`;
-            document.getElementById('searcher').value = `${localStorage.getItem('employeeUsername')}`;
         }).catch(error => {
             console.error(error);
         });
@@ -42,12 +41,9 @@ try {
     document.getElementById('search-button').addEventListener('click', () => {
         const pattern = document.getElementById('file-search').value;
         const directory = document.getElementById('dir-path').value;
-        const userName = document.getElementById('searcher').value;
+        const userName = localStorage.getItem('employeeUsername');
 
-        notification.sendNotification({
-            title: `Username is ${userName}!`,
-        });
-
+        
         // Show the loading spinner
         Swal.fire({
             html: `<h3>Fetching files... <b></b></h3>`,
@@ -58,7 +54,7 @@ try {
             },
         })
 
-        window.__TAURI__.invoke('find_files', { pattern: pattern, directory: directory, searchedBy: userName }).then(files => {
+        window.__TAURI__.invoke('find_files', { pattern: pattern, directory: directory, searcher: userName }).then(files => {
             const resultsContainer = document.getElementById('results-container');
             resultsContainer.innerHTML = '';
 
