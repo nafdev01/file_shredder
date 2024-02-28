@@ -55,6 +55,17 @@ pub struct Department {
     pub created_at: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Search {
+    pub searchid: i32,
+    pub searcher: String,
+    pub word: String,
+    pub directory: String,
+    pub no_of_files: i32,
+    pub searched_at: String,
+}
+
+
 // write code that initializes the database and creates the tables needed for the application.
 pub fn initialize_database() -> Result<(), CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
@@ -112,7 +123,7 @@ pub fn initialize_database() -> Result<(), CustomError> {
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS searches (
-            search_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            searchid INTEGER PRIMARY KEY AUTOINCREMENT,
             searcher TEXT NOT NULL,
             word TEXT NOT NULL,
             directory TEXT NOT NULL,

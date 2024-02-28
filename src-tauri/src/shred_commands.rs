@@ -1,7 +1,9 @@
+use crate::initialize_app::{CustomError, Search};
 use crate::shredder_functions::log_search;
 use notify_rust::Notification as DesktopNotification;
 use regex::Regex;
 use walkdir::WalkDir;
+
 #[tauri::command]
 pub async fn find_files(pattern: String, directory: String, searcher: String) -> Vec<String> {
     let re = Regex::new(&pattern).unwrap();
@@ -45,4 +47,32 @@ pub async fn find_files(pattern: String, directory: String, searcher: String) ->
     };
 
     files
+}
+
+#[tauri::command]
+pub fn get_search_history(searcher: String) -> Result<Vec<Search>, CustomError> {
+    let conn = rusqlite::Connection::open("shredder.db")?;
+
+    let mut stmt = conn.prepare(
+        "SELECT word, directory, no_of_files, searched_at from searches 
+        WHERE searcher = ?1",
+    )?;
+
+    let search_iter = stmt.query_map(&[&searcher], |row| {
+        Ok(Search {
+            searchid: 0,
+            searcher: searcher.clone(),
+            word: row.get(0)?,
+            directory: row.get(1)?,
+            no_of_files: row.get(2)?,
+            searched_at: row.get(3)?,
+        })
+    })?;
+
+    let mut search_history = Vec::new();
+    for search in search_iter {
+        search_history.push(search?);
+    }
+
+    Ok(search_history)
 }

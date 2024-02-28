@@ -3,18 +3,17 @@
 use notify_rust::Notification as DesktopNotification;
 use notify_rust::Timeout;
 
-mod initialize_app;
 mod auth_commands;
-mod user_commands;
+mod initialize_app;
 mod shred_commands;
 mod shredder_functions;
+mod user_commands;
 
 use crate::initialize_app::initialize_database;
 
 fn main() {
     match initialize_database() {
-        Ok(_) => {
-        }
+        Ok(_) => {}
         Err(_e) => {
             DesktopNotification::new()
                 .summary("File Shredder Database Initialization Error!")
@@ -26,23 +25,21 @@ fn main() {
         }
     }
 
-    tauri::Builder
-        ::default()
-        .invoke_handler(
-            tauri::generate_handler![
-                auth_commands::get_departments,
-                auth_commands::create_employee,
-                auth_commands::authenticate_employee,
-                auth_commands::authenticate_admin,
-                user_commands::get_employee,
-                user_commands::get_admin,
-                user_commands::update_employee,
-                user_commands::update_admin,
-                user_commands::change_employee_password,
-                user_commands::change_admin_password,
-                shred_commands::find_files,
-            ]
-        )
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![
+            auth_commands::get_departments,
+            auth_commands::create_employee,
+            auth_commands::authenticate_employee,
+            auth_commands::authenticate_admin,
+            user_commands::get_employee,
+            user_commands::get_admin,
+            user_commands::update_employee,
+            user_commands::update_admin,
+            user_commands::change_employee_password,
+            user_commands::change_admin_password,
+            shred_commands::find_files,
+            shred_commands::get_search_history,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

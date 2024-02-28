@@ -14019,6 +14019,33 @@ button.close:focus {
     background: #fff
 }
 
+/* write the code for app-btn-danger */
+.app-btn-danger {
+    background: #dc3545;
+    color: white;
+    border: 1px solid #dc3545
+}
+
+.app-btn-danger:hover {
+    color: #fff;
+    background: #da2d27;
+    border: 1px solid #e74c3c
+}
+
+/* write the code for app-btn-success */
+.app-btn-success {
+    background: #28a745;
+    color: white;
+    border: 1px solid #28a745;
+}
+
+.app-btn-success:hover {
+    color: #fff;
+    background: #218838;
+    border: 1px solid #1e7e34;
+}
+
+
 .btn-light {
     background: #f5f6fe;
     color: #15a362
