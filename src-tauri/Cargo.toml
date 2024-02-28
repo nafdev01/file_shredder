@@ -1,6 +1,6 @@
 [package]
 name = "file_shredder"
-version = "0.0.5"
+version = "0.0.6"
 description = "File Shredder is a secure and efficient application built with Tauri. It allows users to permanently delete files from their system, ensuring that the data cannot be recovered."
 authors = ["priest"]
 edition = "2021"
