@@ -39,6 +39,8 @@ fn main() {
             user_commands::change_admin_password,
             shred_commands::find_files,
             shred_commands::get_search_history,
+            shred_commands::create_shred_request,
+            shred_commands::get_shred_requests,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

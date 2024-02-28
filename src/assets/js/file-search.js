@@ -1,22 +1,7 @@
-
-
-
 const invoke = window.__TAURI__.invoke
 const notification = window.__TAURI__.notification
 const dialog = window.__TAURI__.dialog
 
-function shredRequest(shredButton) {
-    filePath = shredButton.getAttribute('data-file');
-    Swal.fire({
-        title: 'Are you sure?',
-        text: `You are about to shred the file: ${filePath}`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, shred it!',
-        cancelButtonText: 'No, cancel!',
-        reverseButtons: true
-    })
-}
 
 function formatTimestamp(searched_at) {
     // Create a Date object from the timestamp string
@@ -90,7 +75,7 @@ if (document.querySelector('#dir-button')) {
             const pattern = document.getElementById('file-search').value;
             const directory = document.getElementById('dir-path').value;
             const userName = localStorage.getItem('employeeUsername');
-
+            const employeeId = localStorage.getItem('employeeId');
 
             // Show the loading spinner
             Swal.fire({
@@ -101,7 +86,7 @@ if (document.querySelector('#dir-button')) {
                 },
             })
 
-            invoke('find_files', { pattern: pattern, directory: directory, searcher: userName }).then(files => {
+            invoke('find_files', { pattern: pattern, directory: directory, searcher: employeeId }).then(files => {
                 const resultsContainer = document.getElementById('results-container');
                 resultsContainer.innerHTML = '';
                 const directoryPath = document.getElementById('dir-path').value;
@@ -136,7 +121,7 @@ if (document.querySelector('#dir-button')) {
 
                         // Create a 'button' and set its 'data-file' attribute to the file's full path
                         const buttonElement = document.createElement('button');
-                        buttonElement.textContent = 'Click me';
+                        buttonElement.textContent = 'Request Shred';
                         buttonElement.setAttribute('data-file', `${directoryPath}/${file}`);
                         // add the shred-button class to the button
                         buttonElement.className = 'btn btn-danger';
@@ -190,8 +175,9 @@ if (document.querySelector('#history-table')) {
     try {
         const historyTableBody = document.querySelector('#history-table-body');
         const userName = localStorage.getItem('employeeUsername');
+        const employeeId = localStorage.getItem('employeeId');
 
-        invoke('get_search_history', { searcher: userName }).then(history => {
+        invoke('get_search_history', { searcher: employeeId }).then(history => {
             if (history.length === 0) {
                 const noHistoryElement = document.createElement('p');
                 noHistoryElement.textContent = 'No search history';
@@ -243,11 +229,13 @@ if (document.querySelector('#history-table')) {
 }
 
 function shredRequest(shredButton) {
-    filePath = shredButton.getAttribute('data-file');
+    filepath = shredButton.getAttribute('data-file');
+
+    const employeeId = localStorage.getItem('employeeId');
 
     Swal.fire({
         title: 'Are you sure?',
-        html: `You are about to submit a shred request for the file: <b>${filePath}</b>`,
+        html: `You are about to submit a shred request for the file: <b>${filepath}</b>`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: `Submit&nbsp;<i class="fas fa-arrow-right"></i>`,
@@ -257,7 +245,21 @@ function shredRequest(shredButton) {
             confirmButton: "btn app-btn-success mx-2",
             cancelButton: "btn app-btn-danger mx-2"
         },
-        buttonsStyling: false
-
-    });
+        buttonsStyling: false,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            invoke('create_shred_request', { requestby: employeeId, filepath: filepath }).then(response => {
+                Swal.fire({
+                    icon: 'Request submitted!',
+                    html: `Your request to shred file <span class="text-warning fw-bold">${filepath}</span> has been submitted sucessfully!`,
+                    text: response,
+                });
+            }).catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: error,
+                });
+            });
+        }
+    })
 }

@@ -91,7 +91,7 @@ pub fn change_employee_password(
     newpassword: String,
 ) -> Result<(), CustomError> {
     if oldpassword == newpassword {
-        return Err(CustomError::PasswordMismatch(
+        return Err(CustomError::AuthenticationError(
             "New password must be different from the old password".to_string(),
         ));
     }
@@ -117,7 +117,7 @@ pub fn change_employee_password(
             )?;
             Ok(())
         } else {
-            Err(CustomError::PasswordMismatch(
+            Err(CustomError::AuthenticationError(
                 "Incorrect password entered".to_string(),
             ))
         }
@@ -155,7 +155,7 @@ pub fn change_admin_password(
     newpassword: String,
 ) -> Result<(), CustomError> {
     if oldpassword == newpassword {
-        return Err(CustomError::PasswordMismatch(
+        return Err(CustomError::AuthenticationError(
             "New password must be different from the old password".to_string(),
         ));
     }
@@ -181,7 +181,7 @@ pub fn change_admin_password(
             )?;
             Ok(())
         } else {
-            Err(CustomError::PasswordMismatch(
+            Err(CustomError::AuthenticationError(
                 "Incorrect password entered".to_string(),
             ))
         }

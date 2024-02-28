@@ -6,7 +6,7 @@ use tauri::InvokeError;
 #[derive(Debug)]
 pub enum CustomError {
     DatabaseError(RusqliteError),
-    PasswordMismatch(String),
+    AuthenticationError(String),
     // Add other kinds of errors as needed
 }
 
@@ -20,7 +20,7 @@ impl Into<InvokeError> for CustomError {
     fn into(self) -> InvokeError {
         match self {
             CustomError::DatabaseError(err) => InvokeError::from(err.to_string()),
-            CustomError::PasswordMismatch(err) => InvokeError::from(err),
+            CustomError::AuthenticationError(err) => InvokeError::from(err),
             // Handle other kinds of errors as needed
         }
     }
@@ -65,6 +65,16 @@ pub struct Search {
     pub searched_at: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ShredRequest {
+    pub requestid: i32,
+    pub requestby: String,
+    pub filepath: String,
+    pub department: String,
+    pub requestto: String,
+    pub requeststatus: String,
+    pub requestat: String,
+}
 
 // write code that initializes the database and creates the tables needed for the application.
 pub fn initialize_database() -> Result<(), CustomError> {
@@ -129,7 +139,24 @@ pub fn initialize_database() -> Result<(), CustomError> {
             directory TEXT NOT NULL,
             no_of_files INTEGER NOT NULL,
             searched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (searcher) REFERENCES employees(username)
+            FOREIGN KEY (searcher) REFERENCES employees(employeeid)
+        );",
+        [],
+    )?;
+
+    // create table shredrequests
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS shredrequests (
+            requestid INTEGER PRIMARY KEY AUTOINCREMENT,
+            requestby TEXT NOT NULL,
+            filepath TEXT NOT NULL,
+            department TEXT NOT NULL,
+            requestto TEXT NOT NULL,
+            requeststatus TEXT CHECK(requeststatus IN ('Pending', 'Approved', 'Denied')) DEFAULT 'Pending',
+            requestat DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (requestby) REFERENCES employees(employeeid),
+            FOREIGN KEY (department) REFERENCES departments(department_name),
+            FOREIGN KEY (requestto) REFERENCES admins(adminid)
         );",
         [],
     )?;

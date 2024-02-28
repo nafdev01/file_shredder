@@ -1,8 +1,12 @@
+use crate::initialize_app::ShredRequest;
 use crate::initialize_app::{CustomError, Search};
 use crate::shredder_functions::log_search;
 use notify_rust::Notification as DesktopNotification;
 use regex::Regex;
+use rusqlite::{params, Connection};
 use walkdir::WalkDir;
+use std::sync::Arc;
+
 
 #[tauri::command]
 pub async fn find_files(pattern: String, directory: String, searcher: String) -> Vec<String> {
@@ -58,10 +62,12 @@ pub fn get_search_history(searcher: String) -> Result<Vec<Search>, CustomError> 
         WHERE searcher = ?1",
     )?;
 
+    let searchid = searcher.parse::<i32>().unwrap();
+
     let search_iter = stmt.query_map(&[&searcher], |row| {
         Ok(Search {
-            searchid: 0,
-            searcher: searcher.clone(),
+            searchid: searchid,
+            searcher: (&"searcher").to_string(),
             word: row.get(0)?,
             directory: row.get(1)?,
             no_of_files: row.get(2)?,
@@ -75,4 +81,54 @@ pub fn get_search_history(searcher: String) -> Result<Vec<Search>, CustomError> 
     }
 
     Ok(search_history)
+}
+
+#[tauri::command]
+pub fn create_shred_request(requestby: String, filepath: String) -> Result<String, String> {
+    let conn = match Connection::open("shredder.db") {
+        Ok(conn) => conn,
+        Err(e) => return Err(format!("Failed to open database: {}", e)),
+    };
+
+    let res = conn.execute(
+        "INSERT INTO shredrequests (requestby, filepath, department, requestto) VALUES (?1, ?2, (SELECT department FROM employees WHERE employeeid = ?1), (SELECT adminid FROM admins WHERE department = (SELECT department FROM employees WHERE employeeid = ?1)))",
+        params![requestby, filepath],
+    );
+
+    match res {
+        Ok(_) => Ok("Shred request created successfully".to_string()),
+        Err(e) => Err(format!("Failed to create shred request: {}", e)),
+    }
+}
+
+#[tauri::command]
+pub fn get_shred_requests(requestto: String) -> Result<Vec<ShredRequest>, CustomError> {
+    let conn = rusqlite::Connection::open("shredder.db")?;
+
+    let mut stmt = conn.prepare(
+        "SELECT requestid, requestby, filepath, department, requeststatus, requestat from shredrequests 
+        WHERE requestto = ?1",
+    )?;
+
+    let requestadmin = Arc::new(requestto.clone());
+
+    let shred_request_iter = stmt.query_map(&[&requestto], |row| {
+        let requestadmin = Arc::clone(&requestadmin);
+        Ok(ShredRequest {
+            requestid: row.get(0)?,
+            requestby: row.get(1)?,
+            filepath: row.get(2)?,
+            department: row.get(3)?,
+            requestto: (*requestadmin).clone(),
+            requeststatus: row.get(4)?,
+            requestat: row.get(5)?,
+        })
+    })?;
+
+    let mut shredrequests = Vec::new();
+    for shredrequest in shred_request_iter {
+        shredrequests.push(shredrequest?);
+    }
+
+    Ok(shredrequests)
 }

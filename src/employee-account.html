@@ -47,100 +47,9 @@
 						</div>
 
 						<div class="app-utilities col-auto">
-							<div class="app-utility-item app-notifications-dropdown dropdown">
-								<a class="dropdown-toggle no-toggle-arrow" id="notifications-dropdown-toggle"
-									data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"
-									title="Notifications">
-									<i class="fas fa-bell fa-xl"></i>
-									<span class="icon-badge">3</span>
-								</a>
-
-								<div class="dropdown-menu p-0" aria-labelledby="notifications-dropdown-toggle">
-									<div class="dropdown-menu-header p-3">
-										<h5 class="dropdown-menu-title mb-0">Notifications</h5>
-									</div>
-									<div class="dropdown-menu-content">
-										<div class="item p-3">
-											<div class="row gx-2 justify-content-between align-items-center">
-												<div class="col-auto">
-													<img class="profile-image"
-														src="assets/images/profiles/profile-1.png" alt="">
-												</div>
-												<div class="col">
-													<div class="info">
-														<div class="desc">
-															Amy shared a file with you. Lorem ipsum dolor
-															sit amet, consectetur adipiscing elit.
-														</div>
-														<div class="meta"> 2 hrs ago</div>
-													</div>
-												</div>
-											</div>
-											<a class="link-mask" href="#"></a>
-										</div>
-										<div class="item p-3">
-											<div class="row gx-2 justify-content-between align-items-center">
-												<div class="col-auto">
-													<div class="app-icon-holder">
-														<i class="fas fa-receipt"></i>
-													</div>
-												</div>
-												<div class="col">
-													<div class="info">
-														<div class="desc">
-															You have a new invoice. Proin venenatis
-															interdum est.
-														</div>
-														<div class="meta"> 1 day ago</div>
-													</div>
-												</div>
-											</div>
-											<a class="link-mask" href="#"></a>
-										</div>
-										<div class="item p-3">
-											<div class="row gx-2 justify-content-between align-items-center">
-												<div class="col-auto">
-													<div class="app-icon-holder icon-holder-mono">
-														<i class="fas fa-chart-line"></i>
-													</div>
-												</div>
-												<div class="col">
-													<div class="info">
-														<div class="desc">
-															Your report is ready. Proin venenatis interdum
-															est.
-														</div>
-														<div class="meta"> 3 days ago</div>
-													</div>
-												</div>
-											</div>
-											<a class="link-mask" href="#"></a>
-										</div>
-										<div class="item p-3">
-											<div class="row gx-2 justify-content-between align-items-center">
-												<div class="col-auto">
-													<img class="profile-image"
-														src="assets/images/profiles/profile-2.png" alt="">
-												</div>
-												<div class="col">
-													<div class="info">
-														<div class="desc">James sent you a new message.</div>
-														<div class="meta"> 7 days ago</div>
-													</div>
-												</div>
-											</div>
-											<a class="link-mask" href="#"></a>
-										</div>
-									</div>
-
-									<div class="dropdown-menu-footer p-2 text-center">
-										<a href="#">View all</a>
-									</div>
-								</div>
-							</div>
 							<div class="app-utility-item">
 								<a href="employee-account.html" title="Settings">
-									<i class="fas fa-cog fa-xl"></i>
+									<i class="fas fa-cog fa-2xl" style="color: green;"></i>
 								</a>
 							</div>
 
@@ -194,12 +103,17 @@
 							</a>
 							<div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
 								<ul class="submenu-list list-unstyled">
+                                    <li class="submenu-item">
+                                        <a class="submenu-link" href="file-search.html">
+                                            <i class="fab fa-searchengin"></i>
+                                            <span>&nbsp;Search for a File</span>
+                                        </a>
+                                    </li>
 									<li class="submenu-item">
-										<a class="submenu-link" href="file-search.html">Search for a File</a>
-									</li>
-									<li class="submenu-item">
-										<a class="submenu-link" href="#">Search
-											History</a>
+										<a class="submenu-link" href="file-search-history.html">
+											<i class="fas fa-history"></i>
+											<span>&nbsp;Search History</span>
+										</a>
 									</li>
 								</ul>
 							</div>
@@ -389,13 +303,15 @@
 											<span class="input-group-text" id="confirm-new-password-addon">
 												<i class="fas fa-check"></i>
 											</span>
-											<input type="password" class="form-control" placeholder="Confirm New Password"
-												aria-label="Confirm New Password" aria-describedby="confirm-new-password-addon"
-												id="employee-confirm-new-password-input" name="employee-confirm-new-password">
+											<input type="password" class="form-control"
+												placeholder="Confirm New Password" aria-label="Confirm New Password"
+												aria-describedby="confirm-new-password-addon"
+												id="employee-confirm-new-password-input"
+												name="employee-confirm-new-password">
 										</div>
 
 										<div class="d-flex justify-content-evenly">
-											<button type="submit" class="btn btn-warning">Update Profile</button>
+											<button type="submit" class="btn btn-warning">Update Password</button>
 											<button type="button" class="btn btn-secondary"
 												data-bs-dismiss="modal">Cancel</button>
 										</div>
