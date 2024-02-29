@@ -162,3 +162,77 @@ function denyShredRequest(denyButton) {
         }
     });
 }
+
+if (localStorage.getItem('employeeId')) {
+    const employeeId = localStorage.getItem('employeeId');
+
+    const searchType = document.getElementById('search-type').value;
+
+    try {
+        invoke(`get_employee_${searchType}_shred_requests`, { requestby: employeeId }).then(shredRequests => {
+            if (shredRequests.length === 0) {
+                document.getElementById('shred-request-table').innerHTML = `
+                    <div class="alert alert-info" role="alert">
+                        <p class="h4">No ${searchType} shred requests.</p<>
+                    </div>
+                `;
+                return;
+            }
+
+            const shredRequestTable = document.getElementById('shred-request-table');
+            let tableContent = `
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Requested At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            shredRequests.forEach(shredRequest => {
+                if (shredRequest.requeststatus === "Approved") {
+                    var statusIcon = `<i class="far fa-thumbs-up fa-2xl" style="color: #029705;"></i>`
+                } else if (shredRequest.requeststatus === "Denied") {
+                    var statusIcon = `<i class="far fa-thumbs-down fa-2xl" style="color: #ea0606;"></i>`
+                } else if (shredRequest.requeststatus === "Pending") {
+                    var statusIcon = `<i class="far fa-thumbs-up fa-2xl" style="color: #029705;"></i>`
+                }
+
+
+                tableContent += `
+                    <tr>
+                        <td>${shredRequest.filepath}</td>
+                        <td>${shredRequest.department}</td>
+                        <td>${statusIcon}</td>
+                        <td>${shredRequest.requestat}</td>
+                        <td>
+                        <div class="dropdown">
+                        <button class="btn btn-sm app-btn-dark dropdown-toggle" type="button" id="actionsDropdown${shredRequest.requestid}" data-bs-toggle="dropdown" aria-expanded="false">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="actionsDropdown${shredRequest.requestid}">
+                            <li>
+                                <button class="dropdown-item btn" data-file="${shredRequest.filepath}" data-file-id="${shredRequest.requestid}" onclick="approveShredRequest(this)">Approve</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item btn" data-file="${shredRequest.filepath}" data-file-id="${shredRequest.requestid}" onclick="denyShredRequest(this)">Deny</button>
+                            </li>
+                        </ul>
+                      </div>
+                      
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableContent += '</tbody>';
+            shredRequestTable.innerHTML = tableContent;
+        });
+    } catch (error) {
+        console.error(error);
+    }
+}

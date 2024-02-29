@@ -7,6 +7,7 @@ mod auth_commands;
 mod initialize_app;
 mod shred_commands;
 mod shredder_functions;
+mod search_commands;
 mod user_commands;
 
 use crate::initialize_app::initialize_database;
@@ -37,13 +38,15 @@ fn main() {
             user_commands::update_admin,
             user_commands::change_employee_password,
             user_commands::change_admin_password,
-            shred_commands::find_files,
-            shred_commands::get_search_history,
+            search_commands::find_files,
+            search_commands::get_search_history,
             shred_commands::create_shred_request,
             shred_commands::get_pending_shred_requests,
             shred_commands::get_approved_shred_requests,
             shred_commands::get_denied_shred_requests,
             shred_commands::update_shred_request,
+            shred_commands::get_employee_approved_shred_requests,
+            shred_commands::get_employee_denied_shred_requests,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -48,7 +48,7 @@
 
 						<div class="app-utilities col-auto">
 							<div class="app-utility-item">
-								<a href="admin-account.html" title="Settings">
+								<a href="employee-account.html" title="Settings">
 									<i class="fas fa-cog fa-xl"></i>
 								</a>
 							</div>
@@ -58,7 +58,7 @@
 									role="button" aria-expanded="false"><img src="assets/images/user_icon.png"
 										alt="user profile"></a>
 								<ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
-									<li><a class="dropdown-item" href="admin-account.html">Account</a></li>
+									<li><a class="dropdown-item" href="employee-account.html">Account</a></li>
 									<li>
 										<hr class="dropdown-divider">
 									</li>
@@ -76,7 +76,7 @@
 			<div class="sidepanel-inner d-flex flex-column">
 				<a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
 				<div class="app-branding">
-					<a class="app-logo" href="admin-dashboard.html">
+					<a class="app-logo" href="employee-dashboard.html">
 						<img class="logo-icon me-2" src="assets/images/app-logo.svg" alt="logo">
 						<span class="logo-text">SHREDDER</span>
 					</a>
@@ -85,10 +85,38 @@
 				<nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
 					<ul class="app-menu list-unstyled accordion" id="menu-accordion">
 						<li class="nav-item">
-							<a class="nav-link" href="admin-dashboard.html">
+							<a class="nav-link" href="employee-dashboard.html">
 								<i class="fas fa-home fa-lg"></i>
 								&nbsp;<span class="nav-link-text">Dashboard</span>
 							</a>
+						</li>
+						<li class="nav-item has-submenu">
+							<a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse"
+								data-bs-target="#submenu-1" aria-expanded="false" aria-controls="submenu-1">
+								<span class="nav-icon">
+									<i class="fas fa-search fa-xl"></i>
+								</span>
+								<span class="nav-link-text">File Search</span>
+								<span class="submenu-arrow">
+									<i class="fas fa-chevron-down"></i>
+								</span>
+							</a>
+							<div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
+								<ul class="submenu-list list-unstyled">
+									<li class="submenu-item">
+										<a class="submenu-link" href="file-search.html">
+											<i class="fab fa-searchengin"></i>
+											&nbsp;<span>Search for a File</span>
+										</a>
+									</li>
+									<li class="submenu-item">
+										<a class="submenu-link" href="file-search-history.html">
+											<i class="fas fa-history"></i>
+											<span>&nbsp;Search History</span>
+										</a>
+									</li>
+								</ul>
+							</div>
 						</li>
 						<li class="nav-item has-submenu">
 							<a class="nav-link submenu-toggle active" href="#" data-bs-toggle="collapse"
@@ -104,19 +132,13 @@
 							<div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
 								<ul class="submenu-list list-unstyled">
 									<li class="submenu-item">
-										<a class="submenu-link" href="pending_shred_requests.html">
-											<i class="far fa-pause-circle fa-lg"></i>
-											&nbsp;<span>Pending</span>
-										</a>
-									</li>
-									<li class="submenu-item">
-										<a class="submenu-link" href="approved_shred_requests.html">
+										<a class="submenu-link" href="employee_approved_shred_requests.html">
 											<i class="far fa-check-circle fa-lg"></i>
 											&nbsp;<span>Approved</span>
 										</a>
 									</li>
 									<li class="submenu-item">
-										<a class="submenu-link active" href="denied_shred_requests.html">
+										<a class="submenu-link active" href="employee_denied_shred_requests.html">
 											<i class="far fa-times-circle fa-lg"></i>
 											<span>&nbsp;Denied</span>
 										</a>
@@ -187,7 +209,7 @@
 	<script src="assets/js/shredder.js"></script>
 
 	<script>
-		if (!isAdminLoggedIn()) {
+		if (!isEmployeeLoggedIn()) {
 			window.__TAURI__.notification.sendNotification({
 				title: 'Login Required',
 				body: 'You need to login to access this page',
@@ -195,7 +217,6 @@
 			window.location.href = 'login.html';
 		}
 	</script>
-
 </body>
 
 </html>
