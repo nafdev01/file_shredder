@@ -39,7 +39,7 @@ if (localStorage.getItem('adminId')) {
                 } else if (shredRequest.requeststatus === "Denied") {
                     var statusIcon = `<i class="far fa-thumbs-down fa-2xl" style="color: #ea0606;"></i>`
                 } else if (shredRequest.requeststatus === "Pending") {
-                    var statusIcon = `<i class="far fa-thumbs-up fa-2xl" style="color: #029705;"></i>`
+                    var statusIcon = `<i class="far fa-thumbs-down fa-2xl" style="color: #029705;"></i>`
                 }
 
 

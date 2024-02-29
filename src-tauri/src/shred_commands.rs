@@ -155,7 +155,7 @@ pub fn get_employee_denied_shred_requests(requestby: String) -> Result<Vec<Shred
             requestby: (*requestemployee).clone(),
             filepath: row.get(2)?,
             department: row.get(3)?,
-            requestto: row.get::<_, i32>(1)?.to_string(), // change here
+            requestto: row.get(1)?, // change here
             requeststatus: row.get(4)?,
             requestat: row.get(5)?,
         })
@@ -187,7 +187,7 @@ pub fn get_employee_approved_shred_requests(requestby: String) -> Result<Vec<Shr
             requestby: (*requestemployee).clone(),
             filepath: row.get(2)?,
             department: row.get(3)?,
-            requestto: row.get::<_, i32>(1)?.to_string(), // change here
+            requestto: row.get(1)?, // change here
             requeststatus: row.get(4)?,
             requestat: row.get(5)?,
         })
