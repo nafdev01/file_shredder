@@ -88,7 +88,7 @@ function approveShredRequest(approvebutton) {
         html: `You are about to approve the shred request for the file: <b>${filepath}</b>`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: 'green',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Approve',
         reverseButtons: true
@@ -130,7 +130,7 @@ function denyShredRequest(denyButton) {
         html: `You are about to deny the shred request for the file: <b>${filepath}</b>`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: 'green',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Deny',
         reverseButtons: true
@@ -187,7 +187,7 @@ if (localStorage.getItem('employeeId')) {
                         <th>Department</th>
                         <th>Status</th>
                         <th>Requested At</th>
-                        <th>Actions</th>
+                        ${searchType === 'approved' ? '<th>Actions</th>' : ''}
                     </tr>
                 </thead>
                 <tbody>
@@ -202,29 +202,16 @@ if (localStorage.getItem('employeeId')) {
                     var statusIcon = `<i class="far fa-thumbs-up fa-2xl" style="color: #029705;"></i>`
                 }
 
-
                 tableContent += `
                     <tr>
                         <td>${shredRequest.filepath}</td>
                         <td>${shredRequest.department}</td>
                         <td>${statusIcon}</td>
                         <td>${shredRequest.requestat}</td>
+                        ${searchType === 'approved' ? `
                         <td>
-                        <div class="dropdown">
-                        <button class="btn btn-sm app-btn-dark dropdown-toggle" type="button" id="actionsDropdown${shredRequest.requestid}" data-bs-toggle="dropdown" aria-expanded="false">
-                            Actions
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="actionsDropdown${shredRequest.requestid}">
-                            <li>
-                                <button class="dropdown-item btn" data-file="${shredRequest.filepath}" data-file-id="${shredRequest.requestid}" onclick="approveShredRequest(this)">Approve</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item btn" data-file="${shredRequest.filepath}" data-file-id="${shredRequest.requestid}" onclick="denyShredRequest(this)">Deny</button>
-                            </li>
-                        </ul>
-                      </div>
-                      
-                        </td>
+                            <button class="dropdown-item btn app-btn-danger rounded-pill" data-file="${shredRequest.filepath}" data-file-id="${shredRequest.requestid}" onclick="completeShredRequest(this)">Shred</button>
+                      </td>` : ''}
                     </tr>
                 `;
             });
@@ -235,4 +222,20 @@ if (localStorage.getItem('employeeId')) {
     } catch (error) {
         console.error(error);
     }
+}
+
+function completeShredRequest(denyButton) {
+    const filepath = denyButton.getAttribute('data-file');
+    const fileId = denyButton.getAttribute('data-file-id');
+
+    Swal.fire({
+        title: 'Are you sure?',
+        html: `You are about to shred the file: <b>${filepath}</b>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: 'green',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Shred',
+        reverseButtons: true
+    });
 }

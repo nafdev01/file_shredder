@@ -14024,6 +14024,7 @@ button.close:focus {
     background: #dc3545;
     color: white;
     border: 1px solid #dc3545
+    border-radius: 5px;
 }
 
 .app-btn-danger:hover {
