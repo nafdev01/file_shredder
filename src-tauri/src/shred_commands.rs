@@ -2,7 +2,7 @@ use crate::initialize_app::ShredRequest;
 use crate::initialize_app::{CustomError};
 use rusqlite::{params, Connection};
 use std::sync::Arc;
-
+use crate::shred_file::shred_file;
 
 #[tauri::command]
 pub fn create_shred_request(requestby: String, filepath: String) -> Result<String, String> {
@@ -199,4 +199,15 @@ pub fn get_employee_approved_shred_requests(requestby: String) -> Result<Vec<Shr
     }
 
     Ok(shredrequests)
+}
+
+
+#[tauri::command]
+pub fn complete_shred_request(shredfile: String) -> Result<(), String> {
+    let path = shredfile; // shredfile is already a String representing the path
+
+    match shred_file(&path) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string()),
+    }
 }

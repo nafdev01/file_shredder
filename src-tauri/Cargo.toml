@@ -18,9 +18,13 @@ rusqlite = { version =  "0.31.0", features = ["bundled"] }
 notify-rust = "4.10.0"
 regex = "1.10.3"
 walkdir = "2.4.0"
-dirs = "5.0.1"
+rand = "0.8.4"
+rand_chacha = "0.3.1"
+
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
+
+[workspace]

@@ -9,6 +9,7 @@ mod shred_commands;
 mod shredder_functions;
 mod search_commands;
 mod user_commands;
+mod shred_file;
 
 use crate::initialize_app::initialize_database;
 
@@ -47,6 +48,7 @@ fn main() {
             shred_commands::update_shred_request,
             shred_commands::get_employee_approved_shred_requests,
             shred_commands::get_employee_denied_shred_requests,
+            shred_commands::complete_shred_request,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

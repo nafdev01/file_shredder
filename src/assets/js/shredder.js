@@ -237,5 +237,23 @@ function completeShredRequest(denyButton) {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Shred',
         reverseButtons: true
-    });
+    }).then((result) => {
+        if (result.isConfirmed) {
+            invoke('complete_shred_request', { shredfile: filepath }).then(response => {
+                Swal.fire({
+                    title: 'Shredded!',
+                    text: `The file: ${filepath} has been shredded.`,
+                    icon: 'success'
+                }).then(() => {
+                    location.reload();
+                });
+            }).catch(error => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: `An unexpected error occurred: ${error}`,
+                    icon: 'error'
+                });
+            });
+        }
+    })
 }
