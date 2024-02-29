@@ -153,6 +153,7 @@ pub fn initialize_database() -> Result<(), CustomError> {
             department TEXT NOT NULL,
             requestto TEXT NOT NULL,
             requeststatus TEXT CHECK(requeststatus IN ('Pending', 'Approved', 'Denied')) DEFAULT 'Pending',
+            deleted BOOLEAN DEFAULT 0,
             requestat DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (requestby) REFERENCES employees(employeeid),
             FOREIGN KEY (department) REFERENCES departments(department_name),

@@ -39,7 +39,7 @@ if (localStorage.getItem('adminId')) {
                 } else if (shredRequest.requeststatus === "Denied") {
                     var statusIcon = `<i class="far fa-thumbs-down fa-2xl" style="color: #ea0606;"></i>`
                 } else if (shredRequest.requeststatus === "Pending") {
-                    var statusIcon = `<i class="far fa-thumbs-down fa-2xl" style="color: #029705;"></i>`
+                    var statusIcon = `<i class="fas fa-spinner fa-2xl" style="color: orange;"></i>`
                 }
 
 
@@ -248,11 +248,22 @@ function completeShredRequest(denyButton) {
                     location.reload();
                 });
             }).catch(error => {
-                Swal.fire({
-                    title: 'Error!',
-                    text: `An unexpected error occurred: ${error}`,
-                    icon: 'error'
-                });
+
+                if (error.toString().toLowerCase().includes('no such file or directory')) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: `File does not exist`,
+                        icon: 'error'
+                    });
+                    return;
+
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: `An unexpected error occurred: ${error}`,
+                        icon: 'error'
+                    });
+                }
             });
         }
     })
