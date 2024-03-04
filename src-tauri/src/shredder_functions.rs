@@ -16,5 +16,3 @@ pub fn log_search(
 
     Ok(())
 }
-
-

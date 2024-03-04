@@ -1,8 +1,8 @@
+use crate::initialize_app::CustomError;
 use crate::initialize_app::ShredRequest;
-use crate::initialize_app::{CustomError};
+use crate::shred_file::shred_file;
 use rusqlite::{params, Connection};
 use std::sync::Arc;
-use crate::shred_file::shred_file;
 
 #[tauri::command]
 pub fn create_shred_request(requestby: String, filepath: String) -> Result<String, String> {
@@ -136,9 +136,10 @@ pub fn update_shred_request(requestid: String, requeststatus: String) -> Result<
     }
 }
 
-
 #[tauri::command]
-pub fn get_employee_denied_shred_requests(requestby: String) -> Result<Vec<ShredRequest>, CustomError> {
+pub fn get_employee_denied_shred_requests(
+    requestby: String,
+) -> Result<Vec<ShredRequest>, CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
 
     let mut stmt = conn.prepare(
@@ -170,7 +171,9 @@ pub fn get_employee_denied_shred_requests(requestby: String) -> Result<Vec<Shred
 }
 
 #[tauri::command]
-pub fn get_employee_approved_shred_requests(requestby: String) -> Result<Vec<ShredRequest>, CustomError> {
+pub fn get_employee_approved_shred_requests(
+    requestby: String,
+) -> Result<Vec<ShredRequest>, CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
 
     let mut stmt = conn.prepare(
@@ -200,7 +203,6 @@ pub fn get_employee_approved_shred_requests(requestby: String) -> Result<Vec<Shr
 
     Ok(shredrequests)
 }
-
 
 #[tauri::command]
 pub fn complete_shred_request(shredfile: String) -> Result<(), String> {

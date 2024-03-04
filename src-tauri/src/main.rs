@@ -5,11 +5,11 @@ use notify_rust::Timeout;
 
 mod auth_commands;
 mod initialize_app;
-mod shred_commands;
-mod shredder_functions;
 mod search_commands;
-mod user_commands;
+mod shred_commands;
 mod shred_file;
+mod shredder_functions;
+mod user_commands;
 
 use crate::initialize_app::initialize_database;
 
@@ -28,6 +28,9 @@ fn main() {
     }
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![
             auth_commands::get_departments,
             auth_commands::create_employee,

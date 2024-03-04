@@ -1,4 +1,4 @@
-const invoke = window.__TAURI__.invoke
+const invoke = window.__TAURI__.core.invoke
 const notification = window.__TAURI__.notification
 const dialog = window.__TAURI__.dialog
 

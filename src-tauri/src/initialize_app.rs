@@ -1,7 +1,7 @@
 use rusqlite::Error as RusqliteError;
 use serde::Deserialize;
 use serde::Serialize;
-use tauri::InvokeError;
+use tauri::ipc::InvokeError;
 
 #[derive(Debug)]
 pub enum CustomError {

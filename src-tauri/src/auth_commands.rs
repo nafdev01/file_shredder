@@ -1,15 +1,14 @@
-use crate::initialize_app::CustomError;
-use crate::initialize_app::Employee;
-use crate::initialize_app::Department;
 use crate::initialize_app::Admin;
+use crate::initialize_app::CustomError;
+use crate::initialize_app::Department;
+use crate::initialize_app::Employee;
 
 #[tauri::command]
 pub fn get_departments() -> Result<Vec<Department>, CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
 
-    let mut stmt = conn.prepare(
-        "SELECT department_id, department_name, created_at from departments"
-    )?;
+    let mut stmt =
+        conn.prepare("SELECT department_id, department_name, created_at from departments")?;
 
     let rows = stmt.query_map([], |row| {
         Ok(Department {
@@ -34,7 +33,7 @@ pub fn create_employee(
     email: String,
     phone: String,
     department: String,
-    password: String
+    password: String,
 ) -> Result<(), CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
 
@@ -53,7 +52,7 @@ pub fn authenticate_employee(username: String, password: String) -> Result<Emplo
     let mut stmt = conn.prepare(
         "SELECT employeeid, fullname, username, email, phone, department, created_at 
         FROM employees 
-        WHERE username = ?1 AND password = ?2"
+        WHERE username = ?1 AND password = ?2",
     )?;
 
     let mut user_iter = stmt.query_map(&[&username, &password], |row| {
@@ -71,7 +70,9 @@ pub fn authenticate_employee(username: String, password: String) -> Result<Emplo
     if let Some(user) = user_iter.next() {
         Ok(user?)
     } else {
-        Err(CustomError::DatabaseError(rusqlite::Error::QueryReturnedNoRows))
+        Err(CustomError::DatabaseError(
+            rusqlite::Error::QueryReturnedNoRows,
+        ))
     }
 }
 
@@ -82,7 +83,7 @@ pub fn authenticate_admin(username: String, password: String) -> Result<Admin, C
     let mut stmt = conn.prepare(
         "SELECT adminid, fullname, username, email, phone, department, created_at 
         FROM admins 
-        WHERE username = ?1 AND password = ?2"
+        WHERE username = ?1 AND password = ?2",
     )?;
 
     let mut user_iter = stmt.query_map(&[&username, &password], |row| {
@@ -100,6 +101,8 @@ pub fn authenticate_admin(username: String, password: String) -> Result<Admin, C
     if let Some(user) = user_iter.next() {
         Ok(user?)
     } else {
-        Err(CustomError::DatabaseError(rusqlite::Error::QueryReturnedNoRows))
+        Err(CustomError::DatabaseError(
+            rusqlite::Error::QueryReturnedNoRows,
+        ))
     }
 }

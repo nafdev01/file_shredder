@@ -1,6 +1,5 @@
-const invoke = window.__TAURI__.invoke
-const notification = window.__TAURI__.notification
-const dialog = window.__TAURI__.dialog
+const invoke = window.__TAURI__.core.invoke
+const dialog = window.__TAURI__.core.dialog
 
 if (localStorage.getItem('adminId')) {
     const adminId = localStorage.getItem('adminId');
