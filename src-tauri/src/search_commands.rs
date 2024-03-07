@@ -29,7 +29,7 @@ pub async fn find_files(pattern: String, directory: String, searcher: String) ->
     match log_search(searcher, pattern, &directory, num_results) {
         Ok(_) => {
             DesktopNotification::new()
-                .summary("Shredder")
+                .summary("SFS")
                 .body(&format!(
                     "Your search for {} in {} returned {} results",
                     search_term, directory_searched, num_results
@@ -39,7 +39,7 @@ pub async fn find_files(pattern: String, directory: String, searcher: String) ->
         }
         Err(e) => {
             DesktopNotification::new()
-                .summary("Shredder")
+                .summary("SFS")
                 .body(&e.to_string())
                 .show()
                 .unwrap();
