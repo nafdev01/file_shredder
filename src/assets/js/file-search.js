@@ -121,7 +121,7 @@ if (document.querySelector('#dir-button')) {
                         // Create a 'button' and set its 'data-file' attribute to the file's full path
                         const buttonElement = document.createElement('button');
                         buttonElement.textContent = 'Request Shred';
-                        buttonElement.setAttribute('data-file', `${directoryPath}/${file}`);
+                        buttonElement.setAttribute('data-file', `${file}`);
                         // add the shred-button class to the button
                         buttonElement.className = 'btn btn-danger';
                         // add the shredRequest function to the button onclick event

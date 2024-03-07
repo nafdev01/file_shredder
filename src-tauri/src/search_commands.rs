@@ -9,24 +9,24 @@ pub async fn find_files(pattern: String, directory: String, searcher: String) ->
     let re = Regex::new(&pattern).unwrap();
     let mut files = Vec::new();
 
-    for entry in WalkDir::new(directory.clone())
+    for entry in WalkDir::new(&directory)
         .into_iter()
         .filter_map(|e| e.ok())
     {
         let path = entry.path();
         if path.is_file() {
-            let file_name = path.file_name().unwrap().to_str().unwrap();
-            if re.is_match(file_name) {
-                files.push(String::from(file_name));
+            let file_path = path.to_string_lossy();
+            if re.is_match(&file_path) {
+                files.push(String::from(file_path));
             }
         }
     }
 
     let num_results = files.len() as i32;
     let search_term = pattern.clone();
-    let directory_searched = directory.clone();
+    let directory_searched = &directory;
 
-    match log_search(searcher, pattern, directory, num_results) {
+    match log_search(searcher, pattern, &directory, num_results) {
         Ok(_) => {
             DesktopNotification::new()
                 .summary("Shredder")

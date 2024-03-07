@@ -4,7 +4,7 @@ use rusqlite::{params, Connection, Result};
 pub fn log_search(
     searcher: String,
     pattern: String,
-    directory: String,
+    directory: &String,
     files_found: i32,
 ) -> Result<()> {
     let conn = Connection::open("shredder.db")?;
