@@ -2,6 +2,8 @@ use crate::initialize_app::CustomError;
 use crate::initialize_app::Employee;
 use crate::initialize_app::Department;
 use crate::initialize_app::Admin;
+use sha1::Digest;
+
 
 #[tauri::command]
 pub fn get_departments() -> Result<Vec<Department>, CustomError> {
@@ -37,10 +39,10 @@ pub fn create_employee(
     password: String
 ) -> Result<(), CustomError> {
     let conn = rusqlite::Connection::open("shredder.db")?;
-
+    
     conn.execute(
         "INSERT INTO employees (fullname, username, email, phone, department, password) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
-        &[&fullname, &username, &email, &phone, &department, &password]
+        &[&fullname, &username, &email, &phone, &department, &hex::encode(sha1::Sha1::digest(password.as_bytes()))]
     )?;
 
     Ok(())
@@ -56,7 +58,7 @@ pub fn authenticate_employee(username: String, password: String) -> Result<Emplo
         WHERE username = ?1 AND password = ?2"
     )?;
 
-    let mut user_iter = stmt.query_map(&[&username, &password], |row| {
+    let mut user_iter = stmt.query_map(&[&username, &hex::encode(sha1::Sha1::digest(password.as_bytes()))], |row| {
         Ok(Employee {
             employeeid: row.get(0)?,
             fullname: row.get(1)?,
@@ -85,7 +87,7 @@ pub fn authenticate_admin(username: String, password: String) -> Result<Admin, C
         WHERE username = ?1 AND password = ?2"
     )?;
 
-    let mut user_iter = stmt.query_map(&[&username, &password], |row| {
+    let mut user_iter = stmt.query_map(&[&username, &hex::encode(sha1::Sha1::digest(password.as_bytes()))], |row| {
         Ok(Admin {
             adminid: row.get(0)?,
             fullname: row.get(1)?,

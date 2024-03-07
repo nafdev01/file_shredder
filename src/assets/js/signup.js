@@ -1,7 +1,5 @@
-// initialize the tauri API for invoking the rust functions and sending desktop notifications
+// initialize the tauri API for invoking the tauri functions 
 const invoke = window.__TAURI__.invoke
-const notification = window.__TAURI__.notification
-const dialog = window.__TAURI__.dialog
 
 // Regular expressions for validating user input
 const usernamePattern = /^.{6,}$/;

@@ -2,6 +2,7 @@ use rusqlite::Error as RusqliteError;
 use serde::Deserialize;
 use serde::Serialize;
 use tauri::InvokeError;
+use sha1::Digest;
 
 #[derive(Debug)]
 pub enum CustomError {
@@ -178,7 +179,7 @@ pub fn initialize_database() -> Result<(), CustomError> {
                 &format!("admin_{}", i),
                 &format!("admin_{}@company.com", i),
                 &format!("123456789{}", i),
-                &format!("{}", "Password*2001"),
+                &format!("{}", &hex::encode(sha1::Sha1::digest("Password*2001".as_bytes()))),
                 &format!("{}", department),
             ]
         )?;

@@ -1,5 +1,4 @@
 const invoke = window.__TAURI__.invoke
-const notification = window.__TAURI__.notification
 
 const employeeForm = document.querySelector('#employee-login-form');
 const adminForm = document.querySelector('#admin-login-form');
