@@ -109,13 +109,16 @@ pub fn change_employee_password(
 
     if let Some(user) = user_iter.next() {
         let password: String = user?;
-        let oldhashed: String= hex::encode(sha1::Sha1::digest(oldpassword.as_bytes()));
-        if password ==  oldhashed{
+        let oldhashed: String = hex::encode(sha1::Sha1::digest(oldpassword.as_bytes()));
+        if password == oldhashed {
             conn.execute(
                 "UPDATE employees 
                 SET password = ?1
                 WHERE employeeid = ?2",
-                &[&hex::encode(sha1::Sha1::digest(newpassword.as_bytes())), &employeeid],
+                &[
+                    &hex::encode(sha1::Sha1::digest(newpassword.as_bytes())),
+                    &employeeid,
+                ],
             )?;
             Ok(())
         } else {
@@ -174,13 +177,16 @@ pub fn change_admin_password(
 
     if let Some(user) = user_iter.next() {
         let password: String = user?;
-        let oldhashed: String= hex::encode(sha1::Sha1::digest(oldpassword.as_bytes()));
+        let oldhashed: String = hex::encode(sha1::Sha1::digest(oldpassword.as_bytes()));
         if password == oldhashed {
             conn.execute(
                 "UPDATE admins 
                 SET password = ?1
                 WHERE adminid = ?2",
-                &[&hex::encode(sha1::Sha1::digest(newpassword.as_bytes())), &adminid],
+                &[
+                    &hex::encode(sha1::Sha1::digest(newpassword.as_bytes())),
+                    &adminid,
+                ],
             )?;
             Ok(())
         } else {

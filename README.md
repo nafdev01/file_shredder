@@ -24,12 +24,12 @@ To install SFS, follow these steps:
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/sfs.git
+   git clone https://github.com/nafdev01/file_shredder.git
    ```
 
 2. Navigate to the project directory:
    ```
-   cd sfs
+   cd file_shredder
    ```
 
 3. Build the project:
@@ -39,7 +39,7 @@ To install SFS, follow these steps:
 
 4. Run the application:
    ```
-   ./target/release/sfs
+   ./target/release/file_shredder
    ```
 
 ## Usage
@@ -53,7 +53,6 @@ Upon running the application, users will be prompted to log in using their crede
 
 - **Admin** (in addition to employee functionalities):
   - Approve deletion requests.
-  - Perform administrative actions, such as user management.
 
 ## Configuration
 

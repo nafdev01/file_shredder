@@ -9,10 +9,7 @@ pub async fn find_files(pattern: String, directory: String, searcher: String) ->
     let re = Regex::new(&pattern).unwrap();
     let mut files = Vec::new();
 
-    for entry in WalkDir::new(&directory)
-        .into_iter()
-        .filter_map(|e| e.ok())
-    {
+    for entry in WalkDir::new(&directory).into_iter().filter_map(|e| e.ok()) {
         let path = entry.path();
         if path.is_file() {
             let file_path = path.to_string_lossy();

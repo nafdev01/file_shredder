@@ -1,5 +1,5 @@
 // initialize the tauri API for invoking the tauri functions 
-const invoke = window.__TAURI__.invoke
+const { invoke } = window.__TAURI__.core;
 
 // Regular expressions for validating user input
 const usernamePattern = /^.{6,}$/;

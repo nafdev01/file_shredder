@@ -1,5 +1,5 @@
-const invoke = window.__TAURI__.invoke
-const dialog = window.__TAURI__.dialog
+const { invoke } = window.__TAURI__.core;
+const { open } = window.__TAURI__.dialog;
 
 
 function formatTimestamp(searched_at) {
@@ -36,7 +36,7 @@ function formatTimestamp(searched_at) {
 if (document.querySelector('#dir-button')) {
     try {
         document.querySelector('#dir-button').addEventListener('click', function () {
-            dialog.open({
+            open({
                 directory: true,
                 defaultPath: document.getElementById('dir-path').value
             }).then(directory => {
@@ -249,7 +249,8 @@ function shredRequest(shredButton) {
         if (result.isConfirmed) {
             invoke('create_shred_request', { requestby: employeeId, filepath: filepath }).then(response => {
                 Swal.fire({
-                    icon: 'Request submitted!',
+                    icon: 'success',
+                    title: 'Request submitted!',
                     html: `Your request to shred file <span class="text-warning fw-bold">${filepath}</span> has been submitted sucessfully!`,
                     text: response,
                 });

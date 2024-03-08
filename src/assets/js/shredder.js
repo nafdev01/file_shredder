@@ -1,4 +1,4 @@
-const invoke = window.__TAURI__.invoke
+const { invoke } = window.__TAURI__.core;
 
 if (localStorage.getItem('adminId')) {
     const adminId = localStorage.getItem('adminId');

@@ -1,4 +1,4 @@
-const invoke = window.__TAURI__.invoke
+const { invoke } = window.__TAURI__.core;
 const notification = window.__TAURI__.notification
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$*]).{8,}$/;
