@@ -1,7 +1,7 @@
 const { invoke } = window.__TAURI__.core;
 
 if (localStorage.getItem('adminId')) {
-    const adminId = localStorage.getItem('adminId');
+    const adminId = parseInt(localStorage.getItem('adminId'));
 
     const searchType = document.getElementById('search-type').value;
 
@@ -72,7 +72,11 @@ if (localStorage.getItem('adminId')) {
             shredRequestTable.innerHTML = tableContent;
         });
     } catch (error) {
-        console.error(error);
+        Swal.fire({
+            title: 'Error!',
+            text: `${error}`,
+            icon: 'success'
+        });
     }
 }
 
@@ -92,8 +96,8 @@ function approveShredRequest(approvebutton) {
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) {
-            invoke('update_shred_request', { requestid: fileId, requeststatus: "Approved" }).then(response => {
-                if (response) {
+            invoke('update_shred_request', { requestid: parseInt(fileId), requeststatus: "Approved" }).then(response => {
+                if (response == "Success") {
                     Swal.fire({
                         title: 'Approved!',
                         text: `The shred request for the file: ${filepath} has been approved.`,
@@ -104,7 +108,7 @@ function approveShredRequest(approvebutton) {
                 } else {
                     Swal.fire({
                         title: 'Failed!',
-                        text: `The shred request for the file: ${filepath} could not be approved.`,
+                        text: `The shred request for the file: ${filepath} could not be approved.Error was ${response}`,
                         icon: 'error'
                     });
                 }
@@ -134,8 +138,8 @@ function denyShredRequest(denyButton) {
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) {
-            invoke('update_shred_request', { requestid: fileId, requeststatus: "Denied" }).then(response => {
-                if (response) {
+            invoke('update_shred_request', { requestid: parseInt(fileId), requeststatus: "Denied" }).then(response => {
+                if (response == "Success") {
                     Swal.fire({
                         title: 'Denied!',
                         text: `The shred request for the file: ${filepath} has been denied.`,
@@ -162,7 +166,7 @@ function denyShredRequest(denyButton) {
 }
 
 if (localStorage.getItem('employeeId')) {
-    const employeeId = localStorage.getItem('employeeId');
+    const employeeId = parseInt(localStorage.getItem('employeeId'));
 
     const searchType = document.getElementById('search-type').value;
 
@@ -216,9 +220,19 @@ if (localStorage.getItem('employeeId')) {
 
             tableContent += '</tbody>';
             shredRequestTable.innerHTML = tableContent;
+        }).catch(error => {
+            Swal.fire({
+                title: 'Error!',
+                text: `${error}`,
+                icon: 'success'
+            });
         });
     } catch (error) {
-        console.error(error);
+        Swal.fire({
+            title: 'Error!',
+            text: `${error}`,
+            icon: 'success'
+        });
     }
 }
 
@@ -237,32 +251,41 @@ function completeShredRequest(denyButton) {
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) {
-            invoke('complete_shred_request', { shredfile: filepath }).then(response => {
-                Swal.fire({
-                    title: 'Shredded!',
-                    text: `The file: ${filepath} has been shredded.`,
-                    icon: 'success'
-                }).then(() => {
-                    location.reload();
+            invoke('complete_shred_request', { shredfile: filepath })
+                .then(response => {
+                    if (response == "success") {
+                        Swal.fire({
+                            title: 'Shredded!',
+                            text: `The file: ${filepath} has been shredded.`,
+                            icon: 'success'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Failed!',
+                            text: `The file: ${filepath} could not be shredded. Error: ${response} `,
+                            icon: 'error'
+                        });
+                    }
+                }).catch(error => {
+                    if (error.toString().toLowerCase().includes('no such file or directory')) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: `File does not exist`,
+                            icon: 'error'
+                        });
+                        return;
+
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: `An unexpected error occurred: ${error}`,
+                            icon: 'error'
+                        });
+                    }
                 });
-            }).catch(error => {
-
-                if (error.toString().toLowerCase().includes('no such file or directory')) {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: `File does not exist`,
-                        icon: 'error'
-                    });
-                    return;
-
-                } else {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: `An unexpected error occurred: ${error}`,
-                        icon: 'error'
-                    });
-                }
-            });
         }
     })
 }

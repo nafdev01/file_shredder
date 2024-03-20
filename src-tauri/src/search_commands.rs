@@ -1,11 +1,30 @@
 use crate::initialize_app::{CustomError, Search};
-use crate::shredder_functions::log_search;
 use notify_rust::Notification as DesktopNotification;
+use postgres::{Client, NoTls};
 use regex::Regex;
 use walkdir::WalkDir;
 
+fn log_search(
+    searcher: &i32,
+    pattern: &String,
+    directory: &String,
+    files_found: &i32,
+) -> Result<(), CustomError> {
+    let mut client = Client::connect(
+        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        NoTls,
+    )?;
+
+    client.execute(
+        "INSERT INTO searches (searcher,word, directory, no_of_files) VALUES ($1, $2, $3, $4)",
+        &[searcher, pattern, directory, files_found],
+    )?;
+
+    Ok(())
+}
+
 #[tauri::command]
-pub async fn find_files(pattern: String, directory: String, searcher: String) -> Vec<String> {
+pub fn find_files(pattern: String, directory: String, searcher: i32) -> Vec<String> {
     let re = Regex::new(&pattern).unwrap();
     let mut files = Vec::new();
 
@@ -23,7 +42,7 @@ pub async fn find_files(pattern: String, directory: String, searcher: String) ->
     let search_term = pattern.clone();
     let directory_searched = &directory;
 
-    match log_search(searcher, pattern, &directory, num_results) {
+    match log_search(&searcher, &pattern, &directory, &num_results) {
         Ok(_) => {
             DesktopNotification::new()
                 .summary("SFS")
@@ -47,30 +66,30 @@ pub async fn find_files(pattern: String, directory: String, searcher: String) ->
 }
 
 #[tauri::command]
-pub fn get_search_history(searcher: String) -> Result<Vec<Search>, CustomError> {
-    let conn = rusqlite::Connection::open("shredder.db")?;
-
-    let mut stmt = conn.prepare(
-        "SELECT word, directory, no_of_files, searched_at from searches 
-        WHERE searcher = ?1",
+pub fn get_search_history(searcher: i32) -> Result<Vec<Search>, CustomError> {
+    let mut client = Client::connect(
+        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        NoTls,
     )?;
 
-    let searchid = searcher.parse::<i32>().unwrap();
-
-    let search_iter = stmt.query_map(&[&searcher], |row| {
-        Ok(Search {
-            searchid: searchid,
-            searcher: (&"searcher").to_string(),
-            word: row.get(0)?,
-            directory: row.get(1)?,
-            no_of_files: row.get(2)?,
-            searched_at: row.get(3)?,
-        })
-    })?;
+    let rows = client.query(
+        "SELECT word, directory, no_of_files, TO_CHAR(searched_at, 'YYYY/MM/DD HH12:MM:SS') AS search_date from searches 
+        WHERE searcher = $1",
+        &[&searcher],
+    )?;
 
     let mut search_history = Vec::new();
-    for search in search_iter {
-        search_history.push(search?);
+
+    for row in &rows {
+        let search = Search {
+            searchid: searcher,
+            searcher: (&"searcher").to_string(),
+            word: row.get(0),
+            directory: row.get(1),
+            no_of_files: row.get(2),
+            searched_at: row.get(3),
+        };
+        search_history.push(search);
     }
 
     Ok(search_history)

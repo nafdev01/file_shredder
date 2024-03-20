@@ -42,7 +42,11 @@ if (document.querySelector('#dir-button')) {
             }).then(directory => {
                 document.getElementById('dir-path').value = `${directory}`;
             }).catch(error => {
-                console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error
+                });
             });
         });
     } catch (error) {
@@ -74,7 +78,7 @@ if (document.querySelector('#dir-button')) {
             const pattern = document.getElementById('file-search').value;
             const directory = document.getElementById('dir-path').value;
             const userName = localStorage.getItem('employeeUsername');
-            const employeeId = localStorage.getItem('employeeId');
+            const employeeId = parseInt(localStorage.getItem('employeeId'));
 
             // Show the loading spinner
             Swal.fire({
@@ -85,7 +89,7 @@ if (document.querySelector('#dir-button')) {
                 },
             })
 
-            invoke('find_files', { pattern: pattern, directory: directory, searcher: employeeId }).then(files => {
+            invoke('find_files', { pattern: pattern, directory: directory, searcher: parseInt(employeeId) }).then(files => {
                 const resultsContainer = document.getElementById('results-container');
                 resultsContainer.innerHTML = '';
                 const directoryPath = document.getElementById('dir-path').value;
@@ -174,9 +178,9 @@ if (document.querySelector('#history-table')) {
     try {
         const historyTableBody = document.querySelector('#history-table-body');
         const userName = localStorage.getItem('employeeUsername');
-        const employeeId = localStorage.getItem('employeeId');
+        const employeeId = parseInt(localStorage.getItem('employeeId'));
 
-        invoke('get_search_history', { searcher: employeeId }).then(history => {
+        invoke('get_search_history', { searcher: parseInt(employeeId) }).then(history => {
             if (history.length === 0) {
                 const noHistoryElement = document.createElement('p');
                 noHistoryElement.textContent = 'No search history';
@@ -230,7 +234,7 @@ if (document.querySelector('#history-table')) {
 function shredRequest(shredButton) {
     filepath = shredButton.getAttribute('data-file');
 
-    const employeeId = localStorage.getItem('employeeId');
+    const employeeId = parseInt(localStorage.getItem('employeeId'));
 
     Swal.fire({
         title: 'Are you sure?',

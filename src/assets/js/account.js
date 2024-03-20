@@ -1,5 +1,5 @@
 const { invoke } = window.__TAURI__.core;
-const notification = window.__TAURI__.notification
+const { notification } = window.__TAURI__;
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$*]).{8,}$/;
 
@@ -56,7 +56,7 @@ if (isEmployeeLoggedIn()) {
         const employeePhoneNo = employeePhoneNoInput.value;
 
         invoke('update_employee', {
-            employeeid: employeeId,
+            employeeid: parseInt(employeeId),
             username: employeeUsername,
             fullname: employeeName,
             email: employeeEmail,
@@ -125,7 +125,7 @@ if (isEmployeeLoggedIn()) {
         }
 
         invoke('change_employee_password', {
-            employeeid: employeeId,
+            employeeid: parseInt(employeeId),
             oldpassword: oldPassword,
             newpassword: newPassword,
         }).then(response => {
@@ -209,7 +209,7 @@ if (isAdminLoggedIn()) {
         const adminPhoneNo = adminPhoneNoInput.value;
 
         invoke('update_admin', {
-            adminid: adminId,
+            adminid: parseInt(adminId),
             username: adminUsername,
             fullname: adminName,
             email: adminEmail,
@@ -278,7 +278,7 @@ if (isAdminLoggedIn()) {
         }
 
         invoke('change_admin_password', {
-            adminid: adminId,
+            adminid: parseInt(adminId),
             oldpassword: oldPassword,
             newpassword: newPassword,
         }).then(response => {
