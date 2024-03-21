@@ -1,30 +1,37 @@
 use crate::initialize_app::{CustomError, Search};
 use notify_rust::Notification as DesktopNotification;
-use postgres::{Client, NoTls};
+use tokio_postgres::NoTls;
 use regex::Regex;
 use walkdir::WalkDir;
 
-fn log_search(
+#[tauri::command]
+pub async fn log_search(
     searcher: &i32,
     pattern: &String,
     directory: &String,
     files_found: &i32,
 ) -> Result<(), CustomError> {
-    let mut client = Client::connect(
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     client.execute(
         "INSERT INTO searches (searcher,word, directory, no_of_files) VALUES ($1, $2, $3, $4)",
         &[searcher, pattern, directory, files_found],
-    )?;
+    ).await?;
 
     Ok(())
 }
 
 #[tauri::command]
-pub fn find_files(pattern: String, directory: String, searcher: i32) -> Vec<String> {
+pub async fn find_files(pattern: String, directory: String, searcher: i32) -> Result<Vec<String>, CustomError> {
     let re = Regex::new(&pattern).unwrap();
     let mut files = Vec::new();
 
@@ -42,7 +49,7 @@ pub fn find_files(pattern: String, directory: String, searcher: i32) -> Vec<Stri
     let search_term = pattern.clone();
     let directory_searched = &directory;
 
-    match log_search(&searcher, &pattern, &directory, &num_results) {
+    match log_search(&searcher, &pattern, &directory, &num_results).await {
         Ok(_) => {
             DesktopNotification::new()
                 .summary("SFS")
@@ -62,21 +69,27 @@ pub fn find_files(pattern: String, directory: String, searcher: i32) -> Vec<Stri
         }
     };
 
-    files
+    Ok(files)
 }
 
 #[tauri::command]
-pub fn get_search_history(searcher: i32) -> Result<Vec<Search>, CustomError> {
-    let mut client = Client::connect(
+pub async fn get_search_history(searcher: i32) -> Result<Vec<Search>, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     let rows = client.query(
         "SELECT word, directory, no_of_files, TO_CHAR(searched_at, 'YYYY/MM/DD HH12:MM:SS') AS search_date from searches 
         WHERE searcher = $1",
         &[&searcher],
-    )?;
+    ).await?;
 
     let mut search_history = Vec::new();
 

@@ -1181,6 +1181,7 @@ dependencies = [
  "tauri-plugin-notification",
  "tauri-plugin-shell",
  "tokio",
+ "tokio-postgres",
  "walkdir",
 ]
 

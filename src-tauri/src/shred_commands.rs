@@ -1,41 +1,53 @@
 use crate::initialize_app::CustomError;
 use crate::initialize_app::ShredRequest;
 use crate::shred_file::shred_file;
-use postgres::{Client, NoTls};
+use tokio_postgres::NoTls;
 
 #[tauri::command]
-pub fn create_shred_request(requestby: i32, filepath: String) -> Result<(), String> {
-    let mut client = match Client::connect(
+pub async fn create_shred_request(requestby: i32, filepath: String) -> Result<(), String> {
+    let (client, connection) = match tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ) {
-        Ok(client) => client,
+    ).await {
+        Ok((client, connection)) => (client, connection),
         Err(e) => return Err(format!("Failed to connect to the database: {}", e)),
     };
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     match client.execute(
         "INSERT INTO shredrequests (requestby, filepath, department, requestto) VALUES ($1, $2, (SELECT department FROM employees WHERE employeeid = $1), (SELECT adminid FROM admins WHERE department = (SELECT department FROM employees WHERE employeeid = $1)))",
         &[&requestby, &filepath],
-    ) {
+    ).await {
         Ok(_) => Ok(()),
         Err(e) => Err(format!("Failed to execute query: {}", e)),
     }
 }
 
 #[tauri::command]
-pub fn get_pending_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, CustomError> {
-        let mut client = Client::connect(
+pub async fn get_pending_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
 
-    let mut shredrequests = Vec::new();
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     let rows = client.query(
         "SELECT requestid, requestby, filepath, department, requeststatus, TO_CHAR(requestat, 'YYYY/MM/DD HH12:MM:SS') AS request_date from shredrequests 
         WHERE requestto = $1 and requeststatus = 'Pending'",
-        &[&requestto ],
-    )?;
+        &[&requestto],
+    ).await?;
+
+    let mut shredrequests = Vec::new();
 
     for row in &rows {
         let shredrequest = ShredRequest {
@@ -50,24 +62,29 @@ pub fn get_pending_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, C
         shredrequests.push(shredrequest);
     }
 
-
     Ok(shredrequests)
 }
 
 #[tauri::command]
-pub fn get_denied_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, CustomError> {
-    let mut client = Client::connect(
+pub async fn get_denied_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
 
-    let mut shredrequests = Vec::new();
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     let rows = client.query(
         "SELECT requestid, requestby, filepath, department, requeststatus, TO_CHAR(requestat, 'YYYY/MM/DD HH12:MM:SS') AS request_date from shredrequests 
         WHERE requestto = $1 and requeststatus = 'Denied'",
-        &[&requestto ],
-    )?;
+        &[&requestto],
+    ).await?;
+
+    let mut shredrequests = Vec::new();
 
     for row in &rows {
         let shredrequest = ShredRequest {
@@ -82,24 +99,29 @@ pub fn get_denied_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, Cu
         shredrequests.push(shredrequest);
     }
 
-
     Ok(shredrequests)
 }
 
 #[tauri::command]
-pub fn get_approved_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, CustomError> {
-    let mut client = Client::connect(
+pub async fn get_approved_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
 
-    let mut shredrequests = Vec::new();
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     let rows = client.query(
         "SELECT requestid, requestby, filepath, department, requeststatus, TO_CHAR(requestat, 'YYYY/MM/DD HH12:MM:SS') AS request_date from shredrequests 
         WHERE requestto = $1 and requeststatus = 'Approved'",
-        &[&requestto ],
-    )?;
+        &[&requestto],
+    ).await?;
+
+    let mut shredrequests = Vec::new();
 
     for row in &rows {
         let shredrequest = ShredRequest {
@@ -118,32 +140,38 @@ pub fn get_approved_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, 
 }
 
 #[tauri::command]
-pub fn update_shred_request(requestid: i32, requeststatus: String) -> Result<String, String> {
-    let mut client = match Client::connect(
+pub async fn update_shred_request(requestid: i32, requeststatus: String) -> Result<String, String> {
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ) {
-        Ok(client) => client,
-        Err(e) => return Err(format!("Failed to connect to the database: {}", e)),
-    };
+    ).await.map_err(|e| format!("Failed to connect to the database: {}", e))?;
 
-    match client.execute(
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
+
+    client.execute(
         "UPDATE shredrequests SET requeststatus = $1 WHERE requestid = $2",
         &[&requeststatus, &requestid],
-    ) {
-        Ok(_) => Ok("Success".to_string()),
-        Err(e) => Err(format!("Failed to execute query: {}", e)),
-    }
+    ).await.map(|_| "Success".to_string()).map_err(|e| format!("Failed to execute query: {}", e))
 }
 
 #[tauri::command]
-pub fn get_employee_denied_shred_requests(
+pub async fn get_employee_denied_shred_requests(
     requestby: i32,
 ) -> Result<Vec<ShredRequest>, CustomError> {
-        let mut client = Client::connect(
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     let mut shredrequests = Vec::new();
 
@@ -151,7 +179,7 @@ pub fn get_employee_denied_shred_requests(
         "SELECT requestid, filepath, department, requeststatus, TO_CHAR(requestat, 'YYYY/MM/DD HH12:MM:SS') AS request_date,requestto from shredrequests 
         WHERE requestby = $1 and requeststatus = 'Denied'",
         &[&requestby ],
-    )?;
+    ).await?;
 
     for row in &rows {
         let shredrequest = ShredRequest {
@@ -171,13 +199,19 @@ pub fn get_employee_denied_shred_requests(
 
 
 #[tauri::command]
-pub fn get_employee_approved_shred_requests(
+pub async fn get_employee_approved_shred_requests(
     requestby: i32,
 ) -> Result<Vec<ShredRequest>, CustomError> {
-        let mut client = Client::connect(
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     let mut shredrequests = Vec::new();
 
@@ -185,7 +219,7 @@ pub fn get_employee_approved_shred_requests(
         "SELECT requestid, filepath, department, requeststatus, TO_CHAR(requestat, 'YYYY/MM/DD HH12:MM:SS') AS request_date,requestto from shredrequests 
         WHERE requestby = $1 and requeststatus = 'Approved'",
         &[&requestby ],
-    )?;
+    ).await?;
 
     for row in &rows {
         let shredrequest = ShredRequest {

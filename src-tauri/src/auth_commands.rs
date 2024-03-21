@@ -2,24 +2,30 @@ use crate::initialize_app::Admin;
 use crate::initialize_app::CustomError;
 use crate::initialize_app::Department;
 use crate::initialize_app::Employee;
-use postgres::{Client, NoTls};
 use sha1::Digest;
+use tokio_postgres::NoTls;
 
 #[tauri::command]
-pub fn get_departments() -> Result<Vec<Department>, CustomError> {
-    let mut client = Client::connect(
+pub async fn get_departments() -> Result<Vec<Department>, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     let rows = client.query(
         "SELECT department_id, department_name from departments",
-        &[],
-    )?;
+        &[]
+    ).await?;
 
     let mut departments = Vec::new();
 
-    for row in &rows {
+    for row in rows {
         let department = Department {
             department_id: row.get(0),
             department_name: row.get(1),
@@ -30,8 +36,9 @@ pub fn get_departments() -> Result<Vec<Department>, CustomError> {
     Ok(departments)
 }
 
+
 #[tauri::command]
-pub fn create_employee(
+pub async fn create_employee(
     fullname: String,
     username: String,
     email: String,
@@ -39,25 +46,37 @@ pub fn create_employee(
     department: String,
     password: String,
 ) -> Result<(), CustomError> {
-    let mut client = Client::connect(
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     client.execute(
         "INSERT INTO employees (fullname, username, email, phone, department, password) VALUES ($1, $2, $3, $4, $5, $6)",
         &[&fullname, &username, &email, &phone, &department, &hex::encode(sha1::Sha1::digest(password.as_bytes()))]
-    )?;
+    ).await?;
 
     Ok(())
 }
 
 #[tauri::command]
-pub fn authenticate_employee(username: String, password: String) -> Result<Employee, CustomError> {
-    let mut client = Client::connect(
+pub async fn authenticate_employee(username: String, password: String) -> Result<Employee, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     let rows = client.query(
         "SELECT employeeid, fullname, username, email, phone, department 
@@ -67,7 +86,7 @@ pub fn authenticate_employee(username: String, password: String) -> Result<Emplo
             &username,
             &hex::encode(sha1::Sha1::digest(password.as_bytes())),
         ],
-    )?;
+    ).await?;
 
     if let Some(row) = rows.iter().next() {
         Ok(Employee {
@@ -84,13 +103,18 @@ pub fn authenticate_employee(username: String, password: String) -> Result<Emplo
         ))
     }
 }
-
 #[tauri::command]
-pub fn authenticate_admin(username: String, password: String) -> Result<Admin, CustomError> {
-    let mut client = Client::connect(
+pub async fn authenticate_admin(username: String, password: String) -> Result<Admin, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    )?;
+    ).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
     let rows = client.query(
         "SELECT adminid, fullname, username, email, phone, department 
@@ -100,7 +124,7 @@ pub fn authenticate_admin(username: String, password: String) -> Result<Admin, C
             &username,
             &hex::encode(sha1::Sha1::digest(password.as_bytes())),
         ],
-    )?;
+    ).await?;
 
     if let Some(row) = rows.iter().next() {
         Ok(Admin {
