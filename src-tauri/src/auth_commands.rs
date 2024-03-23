@@ -1,107 +1,143 @@
-use crate::initialize_app::CustomError;
-use crate::initialize_app::Employee;
-use crate::initialize_app::Department;
 use crate::initialize_app::Admin;
+use crate::initialize_app::CustomError;
+use crate::initialize_app::Department;
+use crate::initialize_app::Employee;
 use sha1::Digest;
-
+use tokio_postgres::NoTls;
 
 #[tauri::command]
-pub fn get_departments() -> Result<Vec<Department>, CustomError> {
-    let conn = rusqlite::Connection::open("shredder.db")?;
+pub async fn get_departments() -> Result<Vec<Department>, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
+        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        NoTls,
+    ).await?;
 
-    let mut stmt = conn.prepare(
-        "SELECT department_id, department_name, created_at from departments"
-    )?;
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
 
-    let rows = stmt.query_map([], |row| {
-        Ok(Department {
-            department_id: row.get(0)?,
-            department_name: row.get(1)?,
-            created_at: row.get(2)?,
-        })
-    })?;
+    let rows = client.query(
+        "SELECT department_id, department_name from departments",
+        &[]
+    ).await?;
 
     let mut departments = Vec::new();
-    for department in rows {
-        departments.push(department?);
+
+    for row in rows {
+        let department = Department {
+            department_id: row.get(0),
+            department_name: row.get(1),
+        };
+        departments.push(department);
     }
 
     Ok(departments)
 }
 
+
 #[tauri::command]
-pub fn create_employee(
+pub async fn create_employee(
     fullname: String,
     username: String,
     email: String,
     phone: String,
     department: String,
-    password: String
+    password: String,
 ) -> Result<(), CustomError> {
-    let conn = rusqlite::Connection::open("shredder.db")?;
-    
-    conn.execute(
-        "INSERT INTO employees (fullname, username, email, phone, department, password) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+    let (client, connection) = tokio_postgres::connect(
+        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        NoTls,
+    ).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
+
+    client.execute(
+        "INSERT INTO employees (fullname, username, email, phone, department, password) VALUES ($1, $2, $3, $4, $5, $6)",
         &[&fullname, &username, &email, &phone, &department, &hex::encode(sha1::Sha1::digest(password.as_bytes()))]
-    )?;
+    ).await?;
 
     Ok(())
 }
 
 #[tauri::command]
-pub fn authenticate_employee(username: String, password: String) -> Result<Employee, CustomError> {
-    let conn = rusqlite::Connection::open("shredder.db")?;
+pub async fn authenticate_employee(username: String, password: String) -> Result<Employee, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
+        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        NoTls,
+    ).await?;
 
-    let mut stmt = conn.prepare(
-        "SELECT employeeid, fullname, username, email, phone, department, created_at 
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
+
+    let rows = client.query(
+        "SELECT employeeid, fullname, username, email, phone, department 
         FROM employees 
-        WHERE username = ?1 AND password = ?2"
-    )?;
+        WHERE username = $1 AND password = $2",
+        &[
+            &username,
+            &hex::encode(sha1::Sha1::digest(password.as_bytes())),
+        ],
+    ).await?;
 
-    let mut user_iter = stmt.query_map(&[&username, &hex::encode(sha1::Sha1::digest(password.as_bytes()))], |row| {
+    if let Some(row) = rows.iter().next() {
         Ok(Employee {
-            employeeid: row.get(0)?,
-            fullname: row.get(1)?,
-            username: row.get(2)?,
-            email: row.get(3)?,
-            phone: row.get(4)?,
-            department: row.get(5)?,
-            created_at: row.get(6)?,
+            employeeid: row.get(0),
+            fullname: row.get(1),
+            username: row.get(2),
+            email: row.get(3),
+            phone: row.get(4),
+            department: row.get(5),
         })
-    })?;
-
-    if let Some(user) = user_iter.next() {
-        Ok(user?)
     } else {
-        Err(CustomError::DatabaseError(rusqlite::Error::QueryReturnedNoRows))
+        Err(CustomError::AuthenticationError(
+            "Invalid username or password".to_string(),
+        ))
     }
 }
-
 #[tauri::command]
-pub fn authenticate_admin(username: String, password: String) -> Result<Admin, CustomError> {
-    let conn = rusqlite::Connection::open("shredder.db")?;
+pub async fn authenticate_admin(username: String, password: String) -> Result<Admin, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
+        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        NoTls,
+    ).await?;
 
-    let mut stmt = conn.prepare(
-        "SELECT adminid, fullname, username, email, phone, department, created_at 
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
+
+    let rows = client.query(
+        "SELECT adminid, fullname, username, email, phone, department 
         FROM admins 
-        WHERE username = ?1 AND password = ?2"
-    )?;
+        WHERE username = $1 AND password = $2",
+        &[
+            &username,
+            &hex::encode(sha1::Sha1::digest(password.as_bytes())),
+        ],
+    ).await?;
 
-    let mut user_iter = stmt.query_map(&[&username, &hex::encode(sha1::Sha1::digest(password.as_bytes()))], |row| {
+    if let Some(row) = rows.iter().next() {
         Ok(Admin {
-            adminid: row.get(0)?,
-            fullname: row.get(1)?,
-            username: row.get(2)?,
-            email: row.get(3)?,
-            phone: row.get(4)?,
-            department: row.get(5)?,
-            created_at: row.get(6)?,
+            adminid: row.get(0),
+            fullname: row.get(1),
+            username: row.get(2),
+            email: row.get(3),
+            phone: row.get(4),
+            department: row.get(5),
         })
-    })?;
-
-    if let Some(user) = user_iter.next() {
-        Ok(user?)
     } else {
-        Err(CustomError::DatabaseError(rusqlite::Error::QueryReturnedNoRows))
+        Err(CustomError::AuthenticationError(
+            "Invalid username or password".to_string(),
+        ))
     }
 }

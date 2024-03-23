@@ -1,5 +1,5 @@
-const invoke = window.__TAURI__.invoke
-const dialog = window.__TAURI__.dialog
+const { invoke } = window.__TAURI__;
+const { open } = window.__TAURI__.dialog;
 
 
 function formatTimestamp(searched_at) {
@@ -36,13 +36,17 @@ function formatTimestamp(searched_at) {
 if (document.querySelector('#dir-button')) {
     try {
         document.querySelector('#dir-button').addEventListener('click', function () {
-            dialog.open({
+            open({
                 directory: true,
                 defaultPath: document.getElementById('dir-path').value
             }).then(directory => {
                 document.getElementById('dir-path').value = `${directory}`;
             }).catch(error => {
-                console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error
+                });
             });
         });
     } catch (error) {
@@ -74,7 +78,7 @@ if (document.querySelector('#dir-button')) {
             const pattern = document.getElementById('file-search').value;
             const directory = document.getElementById('dir-path').value;
             const userName = localStorage.getItem('employeeUsername');
-            const employeeId = localStorage.getItem('employeeId');
+            const employeeId = parseInt(localStorage.getItem('employeeId'));
 
             // Show the loading spinner
             Swal.fire({
@@ -85,7 +89,7 @@ if (document.querySelector('#dir-button')) {
                 },
             })
 
-            invoke('find_files', { pattern: pattern, directory: directory, searcher: employeeId }).then(files => {
+            invoke('find_files', { pattern: pattern, directory: directory, searcher: parseInt(employeeId) }).then(files => {
                 const resultsContainer = document.getElementById('results-container');
                 resultsContainer.innerHTML = '';
                 const directoryPath = document.getElementById('dir-path').value;
@@ -121,7 +125,7 @@ if (document.querySelector('#dir-button')) {
                         // Create a 'button' and set its 'data-file' attribute to the file's full path
                         const buttonElement = document.createElement('button');
                         buttonElement.textContent = 'Request Shred';
-                        buttonElement.setAttribute('data-file', `${directoryPath}/${file}`);
+                        buttonElement.setAttribute('data-file', `${file}`);
                         // add the shred-button class to the button
                         buttonElement.className = 'btn btn-danger';
                         // add the shredRequest function to the button onclick event
@@ -174,9 +178,9 @@ if (document.querySelector('#history-table')) {
     try {
         const historyTableBody = document.querySelector('#history-table-body');
         const userName = localStorage.getItem('employeeUsername');
-        const employeeId = localStorage.getItem('employeeId');
+        const employeeId = parseInt(localStorage.getItem('employeeId'));
 
-        invoke('get_search_history', { searcher: employeeId }).then(history => {
+        invoke('get_search_history', { searcher: parseInt(employeeId) }).then(history => {
             if (history.length === 0) {
                 const noHistoryElement = document.createElement('p');
                 noHistoryElement.textContent = 'No search history';
@@ -230,7 +234,7 @@ if (document.querySelector('#history-table')) {
 function shredRequest(shredButton) {
     filepath = shredButton.getAttribute('data-file');
 
-    const employeeId = localStorage.getItem('employeeId');
+    const employeeId = parseInt(localStorage.getItem('employeeId'));
 
     Swal.fire({
         title: 'Are you sure?',
@@ -249,7 +253,8 @@ function shredRequest(shredButton) {
         if (result.isConfirmed) {
             invoke('create_shred_request', { requestby: employeeId, filepath: filepath }).then(response => {
                 Swal.fire({
-                    icon: 'Request submitted!',
+                    icon: 'success',
+                    title: 'Request submitted!',
                     html: `Your request to shred file <span class="text-warning fw-bold">${filepath}</span> has been submitted sucessfully!`,
                     text: response,
                 });

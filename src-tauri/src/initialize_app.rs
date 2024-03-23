@@ -1,18 +1,20 @@
-use rusqlite::Error as RusqliteError;
+use postgres::{Client, Error, NoTls};
 use serde::Deserialize;
 use serde::Serialize;
-use tauri::InvokeError;
 use sha1::Digest;
+use std::fmt;
+
+use tauri::InvokeError;
 
 #[derive(Debug)]
 pub enum CustomError {
-    DatabaseError(RusqliteError),
+    DatabaseError(Error),
     AuthenticationError(String),
     // Add other kinds of errors as needed
 }
 
-impl From<RusqliteError> for CustomError {
-    fn from(error: RusqliteError) -> Self {
+impl From<Error> for CustomError {
+    fn from(error: Error) -> Self {
         CustomError::DatabaseError(error)
     }
 }
@@ -22,7 +24,15 @@ impl Into<InvokeError> for CustomError {
         match self {
             CustomError::DatabaseError(err) => InvokeError::from(err.to_string()),
             CustomError::AuthenticationError(err) => InvokeError::from(err),
-            // Handle other kinds of errors as needed
+        }
+    }
+}
+
+impl fmt::Display for CustomError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            CustomError::DatabaseError(err) => write!(f, "Database Error: {}", err),
+            CustomError::AuthenticationError(err) => write!(f, "Authentication Error: {}", err),
         }
     }
 }
@@ -35,7 +45,6 @@ pub struct Employee {
     pub email: String,
     pub phone: String,
     pub department: String,
-    pub created_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -46,14 +55,12 @@ pub struct Admin {
     pub email: String,
     pub phone: String,
     pub department: String,
-    pub created_at: String,
 }
 
 #[derive(Debug, Serialize)]
 pub struct Department {
     pub department_id: i32,
     pub department_name: String,
-    pub created_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -69,99 +76,97 @@ pub struct Search {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ShredRequest {
     pub requestid: i32,
-    pub requestby: String,
+    pub requestby: i32,
     pub filepath: String,
     pub department: String,
-    pub requestto: String,
+    pub requestto: i32,
     pub requeststatus: String,
     pub requestat: String,
 }
 
 // write code that initializes the database and creates the tables needed for the application.
 pub fn initialize_database() -> Result<(), CustomError> {
-    let conn = rusqlite::Connection::open("shredder.db")?;
-
-    conn.execute(
-        "CREATE TABLE IF NOT EXISTS departments (
-            department_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            department_name TEXT NOT NULL UNIQUE,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );",
-        [],
+    let mut client = Client::connect(
+        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        NoTls,
     )?;
 
-    conn.execute(
-        "CREATE TABLE IF NOT EXISTS employees (
-            employeeid INTEGER PRIMARY KEY AUTOINCREMENT,
-            fullname TEXT NOT NULL,
-            username TEXT NOT NULL UNIQUE,
-            email TEXT NOT NULL UNIQUE,
-            phone TEXT UNIQUE,
-            password TEXT NOT NULL,
-            department TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (department) REFERENCES departments(department_name)
-        );",
-        [],
+    client.batch_execute(
+        "
+    CREATE TABLE IF NOT EXISTS departments (
+        department_id SERIAL PRIMARY KEY,
+        department_name TEXT NOT NULL UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+        ",
     )?;
 
-    conn.execute(
+    client.batch_execute(
+        "
+    CREATE TABLE IF NOT EXISTS employees (
+        employeeid SERIAL PRIMARY KEY,
+        fullname TEXT NOT NULL,
+        username TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL UNIQUE,
+        phone TEXT UNIQUE,
+        password TEXT NOT NULL,
+        department TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (department) REFERENCES departments(department_name))
+    ",
+    )?;
+
+    client.batch_execute(
         "CREATE TABLE IF NOT EXISTS admins (
-            adminid INTEGER PRIMARY KEY AUTOINCREMENT,
+            adminid SERIAL PRIMARY KEY,
             fullname TEXT NOT NULL,
             username TEXT NOT NULL UNIQUE,
             email TEXT NOT NULL UNIQUE,
             phone TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             department TEXT NOT NULL UNIQUE,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (department) REFERENCES departments(department_name)
-        );",
-        [],
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (department) REFERENCES departments(department_name))
+            ",
     )?;
 
-    // add some initial data to the departments table
-    conn.execute(
-        "INSERT OR IGNORE INTO departments (department_name) VALUES (?1), (?2), (?3), (?4), (?5)",
-        &[
-            "Human Resources",
-            "Finance",
-            "Marketing",
-            "Sales",
-            "Operations",
-        ],
-    )?;
-
-    conn.execute(
+    client.batch_execute(
         "CREATE TABLE IF NOT EXISTS searches (
-            searchid INTEGER PRIMARY KEY AUTOINCREMENT,
-            searcher TEXT NOT NULL,
+            searchid SERIAL PRIMARY KEY,
+            searcher INTEGER NOT NULL,
             word TEXT NOT NULL,
             directory TEXT NOT NULL,
             no_of_files INTEGER NOT NULL,
-            searched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (searcher) REFERENCES employees(employeeid)
-        );",
-        [],
+            searched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (searcher) REFERENCES employees(employeeid))
+        ",
     )?;
 
     // create table shredrequests
-    conn.execute(
+    client.batch_execute(
         "CREATE TABLE IF NOT EXISTS shredrequests (
-            requestid INTEGER PRIMARY KEY AUTOINCREMENT,
-            requestby TEXT NOT NULL,
+            requestid SERIAL PRIMARY KEY,
+            requestby INTEGER NOT NULL,
             filepath TEXT NOT NULL,
             department TEXT NOT NULL,
-            requestto TEXT NOT NULL,
+            requestto INTEGER NOT NULL,
             requeststatus TEXT CHECK(requeststatus IN ('Pending', 'Approved', 'Denied')) DEFAULT 'Pending',
-            deleted BOOLEAN DEFAULT 0,
-            requestat DATETIME DEFAULT CURRENT_TIMESTAMP,
+            deleted BOOLEAN DEFAULT true,
+            requestat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (requestby) REFERENCES employees(employeeid),
             FOREIGN KEY (department) REFERENCES departments(department_name),
-            FOREIGN KEY (requestto) REFERENCES admins(adminid)
-        );",
-        [],
-    )?;
+            FOREIGN KEY (requestto) REFERENCES admins(adminid))
+        ")?;
+
+    client.execute(
+            "INSERT INTO departments (department_name) VALUES ($1), ($2), ($3), ($4), ($5) ON CONFLICT DO NOTHING",
+            &[
+                &"Human Resources",
+                &"Finance",
+                &"Marketing",
+                &"Sales",
+                &"Operations",
+            ],
+        )?;
 
     // add some default admins for each department
     let departments = [
@@ -171,9 +176,10 @@ pub fn initialize_database() -> Result<(), CustomError> {
         "Sales",
         "Operations",
     ];
+
     for (i, department) in departments.iter().enumerate() {
-        conn.execute(
-            "INSERT OR IGNORE INTO admins (fullname, username, email, phone, password, department) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        client.execute(
+            "INSERT INTO admins (fullname, username, email, phone, password, department) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING",
             &[
                 &format!("Default Admin {}", department),
                 &format!("admin_{}", i),

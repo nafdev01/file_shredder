@@ -1,5 +1,5 @@
 // initialize the tauri API for invoking the tauri functions 
-const invoke = window.__TAURI__.invoke
+const { invoke } = window.__TAURI__;
 
 // Regular expressions for validating user input
 const usernamePattern = /^.{6,}$/;
@@ -118,7 +118,7 @@ employeeForm.addEventListener('submit', (event) => {
         }
 
         Swal.fire({
-            title: 'Error!',
+            title: 'Error Here!',
             text: `${errorMessage}`,
             icon: 'error',
             confirmButtonText: 'Ok'
@@ -136,6 +136,9 @@ invoke('get_departments').then(response => {
         option.textContent = department.department_name;
         select.appendChild(option);
     });
-}).catch(error => {
-    console.error(error);
+    Swal.fire({
+        title: 'Error!',
+        text: `${error}`,
+        icon: 'success'
+    });
 });

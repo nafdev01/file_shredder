@@ -6,6 +6,9 @@ authors = ["priest"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "file_shredder_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
 tauri-build = { version = "1.5", features = [] }
@@ -14,7 +17,6 @@ tauri-build = { version = "1.5", features = [] }
 tauri = { version = "1.5", features = [ "dialog-all", "notification-all", "shell-open"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-rusqlite = { version =  "0.31.0", features = ["bundled"] }
 notify-rust = "4.10.0"
 regex = "1.10.3"
 walkdir = "2.4.0"
@@ -22,6 +24,9 @@ rand = "0.8.4"
 rand_chacha = "0.3.1"
 sha-1 = "0.10"
 hex = "0.4"
+postgres = "0.19"
+tokio = { version = "1.0", features = ["full"] }
+tokio-postgres = "0.7.10"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

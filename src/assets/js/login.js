@@ -1,4 +1,4 @@
-const invoke = window.__TAURI__.invoke
+const { invoke } = window.__TAURI__;
 
 const employeeForm = document.querySelector('#employee-login-form');
 const adminForm = document.querySelector('#admin-login-form');
@@ -32,7 +32,9 @@ employeeForm.addEventListener('submit', (event) => {
     ).catch(error => {
         // if the rror i lowercase is query retured no rows
         if (error.toString().toLowerCase().includes('query returned no rows')) {
-            errorMessage = 'Invalid employee username or password';
+            var errorMessage = 'Invalid employee username or password';
+        } else {
+            var errorMessage = error;
         }
 
         Swal.fire({
@@ -74,13 +76,13 @@ adminForm.addEventListener('submit', (event) => {
     ).catch(error => {
         // if the error is lowercase is query retured no rows
         if (error.toString().toLowerCase().includes('query returned no rows')) {
-            errorMessage = 'Invalid admin username or password';
+            var errorMessage = 'Invalid admin username or password';
         }
 
         Swal.fire({
             title: 'Error!',
             text: error, // ensure error is a string
-            icon: 'error',
+            icon: errorMessage,
             confirmButtonText: 'Ok'
         });
     });

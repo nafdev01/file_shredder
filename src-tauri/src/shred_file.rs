@@ -6,7 +6,7 @@ use std::{
 use rand::{RngCore, SeedableRng};
 use rand_chacha::ChaChaRng;
 
-pub fn shred_file(path: &String) -> Result<(), Box<dyn std::error::Error>> {
+pub fn shred_file(path: &String) -> Result<String, Box<dyn std::error::Error>> {
     // open the file for reading and overwriting
     let mut file = match fs::OpenOptions::new()
         .read(true)
@@ -61,5 +61,5 @@ pub fn shred_file(path: &String) -> Result<(), Box<dyn std::error::Error>> {
         return Err(Box::new(e));
     }
 
-    Ok(())
+    Ok("success".to_string())
 }

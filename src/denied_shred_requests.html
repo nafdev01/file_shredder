@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title>File Shredder</title>
+	<title>Secure File Shredder</title>
 
 	<!-- Meta -->
 	<meta charset="utf-8">
@@ -101,7 +101,8 @@
 									<i class="fas fa-chevron-down"></i>
 								</span>
 							</a>
-							<div id="submenu-1" class="collapse submenu submenu-1 show" data-bs-parent="#menu-accordion">
+							<div id="submenu-1" class="collapse submenu submenu-1 show"
+								data-bs-parent="#menu-accordion">
 								<ul class="submenu-list list-unstyled">
 									<li class="submenu-item">
 										<a class="submenu-link" href="pending_shred_requests.html">
@@ -144,9 +145,11 @@
 						<div class="app-card app-card-stat shadow-sm h-100">
 							<div class="app-card-body p-3 p-lg-4">
 								<div class="container" id="shred-requests-container">
-									<table id="shred-request-table" class="table">
+									<div class="table-responsive">
+										<table id="shred-request-table" class="table">
 
-									</table>
+										</table>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -161,7 +164,6 @@
 				<small class="copyright">
 					Designed by @Priest
 				</small>
-
 			</div>
 		</footer>
 	</div>
@@ -173,7 +175,6 @@
 
 	<!-- Charts JS -->
 	<script src="assets/plugins/chart.js/chart.min.js"></script>
-	<script src="assets/js/index-charts.js"></script>
 
 	<!-- Page Specific JS -->
 	<script src="assets/js/app.js"></script>
