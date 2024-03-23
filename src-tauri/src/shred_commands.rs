@@ -238,10 +238,10 @@ pub async fn get_employee_approved_shred_requests(
 }
 
 #[tauri::command]
-pub fn complete_shred_request(shredfile: String) -> Result<String, String> {
+pub async fn complete_shred_request(shredfile: String) -> Result<String, String> {
     let path = shredfile; // shredfile is already a String representing the path
 
-    match shred_file(&path) {
+    match shred_file(&path).await {
         Ok(_) => Ok("success".to_string()),
         Err(e) => Err(e.to_string()),
     }

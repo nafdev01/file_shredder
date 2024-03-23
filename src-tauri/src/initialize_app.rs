@@ -150,7 +150,7 @@ pub fn initialize_database() -> Result<(), CustomError> {
             department TEXT NOT NULL,
             requestto INTEGER NOT NULL,
             requeststatus TEXT CHECK(requeststatus IN ('Pending', 'Approved', 'Denied')) DEFAULT 'Pending',
-            deleted BOOLEAN DEFAULT true,
+            deletion_complete TEXT CHECK(deletion_complete IN ('Yes', 'No')) DEFAULT 'No',
             requestat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (requestby) REFERENCES employees(employeeid),
             FOREIGN KEY (department) REFERENCES departments(department_name),
