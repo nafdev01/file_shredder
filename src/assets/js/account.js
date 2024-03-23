@@ -1,10 +1,24 @@
 const { invoke } = window.__TAURI__;
 const { notification } = window.__TAURI__;
 
+const AccountSwal = Swal.mixin({
+    showConfirmButton: false,
+    didOpen: () => {
+        Swal.showLoading();
+        Swal.getPopup().querySelector("b");
+    },
+});
+
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$*]).{8,}$/;
 
 
 if (isEmployeeLoggedIn()) {
+
+    AccountSwal.fire({
+        title: 'Loading profile ...',
+        html: 'Please wait while we populate your profile with your details <b></b>',
+    });
+
     const employeeId = localStorage.getItem('employeeId');
     const employeeUsername = localStorage.getItem('employeeUsername');
 
@@ -25,6 +39,9 @@ if (isEmployeeLoggedIn()) {
     invoke('get_employee', {
         username: employeeUsername,
     }).then(response => {
+
+        AccountSwal.close();
+
         let employee = response;
 
         // set the values of the HTML elements
@@ -41,6 +58,9 @@ if (isEmployeeLoggedIn()) {
         employeePhoneNoInput.value = employee.phone;
     }
     ).catch(error => {
+
+        AccountSwal.close();
+
         notification.sendNotification({
             title: `Error!`,
             body: `${error}`, // ensure error is a string
@@ -55,6 +75,11 @@ if (isEmployeeLoggedIn()) {
         const employeeEmail = employeeEmailInput.value;
         const employeePhoneNo = employeePhoneNoInput.value;
 
+        AccountSwal.fire({
+            title: 'Updating employee profile ...',
+            html: 'Please wait while we update your profile <b></b>',
+        });
+
         invoke('update_employee', {
             employeeid: parseInt(employeeId),
             username: employeeUsername,
@@ -62,24 +87,16 @@ if (isEmployeeLoggedIn()) {
             email: employeeEmail,
             phone: employeePhoneNo,
         }).then(response => {
+
+            AccountSwal.close();
+
             updateEmployeeSessionDetails(employeeId, employeeUsername, employeeName)
-            Swal.fire({
-                title: `Update successful!`,
-                html: `Please wait while we apply the requested changes to your account <b></b>`,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                timer: 3000,
-                didOpen: () => {
-                    Swal.showLoading();
-                    Swal.getPopup().querySelector("b");
-                },
-            }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.timer) {
-                    window.location.href = 'employee-account.html';
-                }
-            });
+            window.location.href = 'employee-account.html';
         }
         ).catch(error => {
+
+            AccountSwal.close();
+
             Swal.fire({
                 icon: 'error',
                 title: 'Oops!',
@@ -124,28 +141,24 @@ if (isEmployeeLoggedIn()) {
             return;
         }
 
+        AccountSwal.fire({
+            title: 'Changing password ...',
+            html: 'Please wait while we change your password <b></b>',
+        });
+
         invoke('change_employee_password', {
             employeeid: parseInt(employeeId),
             oldpassword: oldPassword,
             newpassword: newPassword,
         }).then(response => {
-            Swal.fire({
-                title: `Password Change successful!`,
-                html: `Please wait while we apply the requested changes to your account <b></b>`,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                timer: 3000,
-                didOpen: () => {
-                    Swal.showLoading();
-                    Swal.getPopup().querySelector("b");
-                },
-            }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.timer) {
-                    window.location.href = 'employee-account.html';
-                }
-            });
+
+            AccountSwal.close();
+            window.location.href = 'employee-account.html';
+
         }
         ).catch(error => {
+            AccountSwal.close();
+
             Swal.fire({
                 icon: 'error',
                 title: 'Oops!',
@@ -175,9 +188,17 @@ if (isAdminLoggedIn()) {
     var adminPhoneNo = null;
     var adminDepartment = null;
 
+    AccountSwal.fire({
+        title: 'Loading admin profile ...',
+        html: 'Please wait while we populate your profile with your details <b></b>',
+    });
+
     invoke('get_admin', {
         username: adminUsername,
     }).then(response => {
+
+        AccountSwal.close();
+
         let admin = response;
 
         // set the values of the HTML elements
@@ -194,6 +215,9 @@ if (isAdminLoggedIn()) {
         adminPhoneNoInput.value = admin.phone;
     }
     ).catch(error => {
+
+        AccountSwal.close();
+
         notification.sendNotification({
             title: `Error!`,
             body: `${error}`, // ensure error is a string
@@ -206,7 +230,11 @@ if (isAdminLoggedIn()) {
         const adminUsername = adminUsernameInput.value;
         const adminName = adminNameInput.value;
         const adminEmail = adminEmailInput.value;
-        const adminPhoneNo = adminPhoneNoInput.value;
+
+        AccountSwal.fire({
+            title: 'Updating admin profile ...',
+            html: 'Please wait while we update your profile <b></b>',
+        });
 
         invoke('update_admin', {
             adminid: parseInt(adminId),
@@ -215,24 +243,17 @@ if (isAdminLoggedIn()) {
             email: adminEmail,
             phone: adminPhoneNo,
         }).then(response => {
+
+            AccountSwal.close();
+
             updateAdminSessionDetails(adminId, adminUsername, adminName)
-            Swal.fire({
-                title: `Update successful!`,
-                html: `Please wait while we apply the requested changes to your account <b></b>`,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                timer: 3000,
-                didOpen: () => {
-                    Swal.showLoading();
-                    Swal.getPopup().querySelector("b");
-                },
-            }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.timer) {
-                    window.location.href = 'admin-account.html';
-                }
-            });
+            window.location.href = 'admin-account.html';
+
         }
         ).catch(error => {
+
+            AccountSwal.close();
+
             Swal.fire({
                 icon: 'error',
                 title: 'Oops!',
@@ -277,28 +298,25 @@ if (isAdminLoggedIn()) {
             return;
         }
 
+        AccountSwal.fire({
+            title: 'Changing password ...',
+            html: 'Please wait while we change your password <b></b>',
+        });
+
         invoke('change_admin_password', {
             adminid: parseInt(adminId),
             oldpassword: oldPassword,
             newpassword: newPassword,
         }).then(response => {
-            Swal.fire({
-                title: `Password Change successful!`,
-                html: `Please wait while we apply the requested changes to your account <b></b>`,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                timer: 3000,
-                didOpen: () => {
-                    Swal.showLoading();
-                    Swal.getPopup().querySelector("b");
-                },
-            }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.timer) {
-                    window.location.href = 'admin-account.html';
-                }
-            });
+
+            AccountSwal.close();
+            window.location.href = 'admin-account.html';
+
         }
         ).catch(error => {
+
+            AccountSwal.close();
+
             Swal.fire({
                 icon: 'error',
                 title: 'Oops!',

@@ -1,9 +1,22 @@
 const { invoke } = window.__TAURI__;
 
+const LoginSwal = Swal.mixin({
+    showConfirmButton: false,
+    didOpen: () => {
+        Swal.showLoading();
+        Swal.getPopup().querySelector("b");
+    },
+});
+
 const employeeForm = document.querySelector('#employee-login-form');
 const adminForm = document.querySelector('#admin-login-form');
 
 employeeForm.addEventListener('submit', (event) => {
+    LoginSwal.fire({
+        title: 'Logging in employee ...',
+        html: 'Please wait while we log you in <b></b>',
+    });
+
     event.preventDefault();
 
     const employeeUsername = document.querySelector('#employee-signin-username').value;
@@ -13,6 +26,7 @@ employeeForm.addEventListener('submit', (event) => {
         username: employeeUsername,
         password: employeePassword,
     }).then(response => {
+        LoginSwal.close();
         let employee = response;
         loginEmployee(employee.employeeid, employee.username, employee.fullname);
         Swal.fire({
@@ -30,6 +44,7 @@ employeeForm.addEventListener('submit', (event) => {
         });
     }
     ).catch(error => {
+        LoginSwal.close();
         // if the rror i lowercase is query retured no rows
         if (error.toString().toLowerCase().includes('query returned no rows')) {
             var errorMessage = 'Invalid employee username or password';
@@ -48,6 +63,11 @@ employeeForm.addEventListener('submit', (event) => {
 
 
 adminForm.addEventListener('submit', (event) => {
+    LoginSwal.fire({
+        title: 'Logging in admin ...',
+        html: 'Please wait while we log you in <b></b>',
+    });
+
     event.preventDefault();
 
     const adminUsername = document.querySelector('#admin-signin-username').value;
@@ -57,6 +77,8 @@ adminForm.addEventListener('submit', (event) => {
         username: adminUsername,
         password: adminPassword,
     }).then(response => {
+        LoginSwal.close();
+
         let admin = response;
         loginAdmin(admin.adminid, admin.username, admin.fullname);
         Swal.fire({
@@ -74,6 +96,8 @@ adminForm.addEventListener('submit', (event) => {
         });
     }
     ).catch(error => {
+        LoginSwal.close();
+
         // if the error is lowercase is query retured no rows
         if (error.toString().toLowerCase().includes('query returned no rows')) {
             var errorMessage = 'Invalid admin username or password';

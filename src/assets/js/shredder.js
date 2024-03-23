@@ -1,12 +1,29 @@
 const { invoke } = window.__TAURI__;
 
+const ShredderSwal = Swal.mixin({
+    showConfirmButton: false,
+    didOpen: () => {
+        Swal.showLoading();
+        Swal.getPopup().querySelector("b");
+    },
+});
+
 if (localStorage.getItem('adminId')) {
     const adminId = parseInt(localStorage.getItem('adminId'));
 
     const searchType = document.getElementById('search-type').value;
 
     try {
+
+        ShredderSwal.fire({
+            title: 'Fetching shred requests ...',
+            html: `Please wait while we fetch ${searchType} shred requests <b></b>`,
+        });
+
         invoke(`get_${searchType}_shred_requests`, { requestto: adminId }).then(shredRequests => {
+
+            ShredderSwal.close();
+
             if (shredRequests.length === 0) {
                 document.getElementById('shred-request-table').innerHTML = `
                     <div class="alert alert-info" role="alert">
@@ -72,6 +89,9 @@ if (localStorage.getItem('adminId')) {
             shredRequestTable.innerHTML = tableContent;
         });
     } catch (error) {
+
+        ShredderSwal.close();
+
         Swal.fire({
             title: 'Error!',
             text: `${error}`,
@@ -96,7 +116,16 @@ function approveShredRequest(approvebutton) {
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) {
+
+            ShredderSwal.fire({
+                title: 'Approving shred request ...',
+                html: `Please wait while we approve the shred request for the file: <b>${filepath}</b>`,
+            });
+        
             invoke('update_shred_request', { requestid: parseInt(fileId), requeststatus: "Approved" }).then(response => {
+
+                ShredderSwal.close();
+
                 if (response == "Success") {
                     Swal.fire({
                         title: 'Approved!',
@@ -113,6 +142,9 @@ function approveShredRequest(approvebutton) {
                     });
                 }
             }).catch(error => {
+
+                ShredderSwal.close();
+
                 Swal.fire({
                     title: 'Error!',
                     text: `${error}`,
@@ -138,7 +170,16 @@ function denyShredRequest(denyButton) {
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) {
+
+            ShredderSwal.fire({
+                title: 'Denying shred request ...',
+                html: `Please wait while we deny the shred request for the file: <b>${filepath}</b>`,
+            });
+
             invoke('update_shred_request', { requestid: parseInt(fileId), requeststatus: "Denied" }).then(response => {
+
+                ShredderSwal.close();
+
                 if (response == "Success") {
                     Swal.fire({
                         title: 'Denied!',
@@ -155,6 +196,9 @@ function denyShredRequest(denyButton) {
                     });
                 }
             }).catch(error => {
+
+                ShredderSwal.close();
+
                 Swal.fire({
                     title: 'Error!',
                     text: `${error}`,
@@ -171,7 +215,16 @@ if (localStorage.getItem('employeeId')) {
     const searchType = document.getElementById('search-type').value;
 
     try {
+
+        ShredderSwal.fire({
+            title: 'Fetching shred requests ...',
+            html: `Please wait while we fetch ${searchType} shred requests <b></b>`,
+        });
+
         invoke(`get_employee_${searchType}_shred_requests`, { requestby: employeeId }).then(shredRequests => {
+
+            ShredderSwal.close();
+
             if (shredRequests.length === 0) {
                 document.getElementById('shred-request-table').innerHTML = `
                     <div class="alert alert-info" role="alert">
@@ -221,6 +274,9 @@ if (localStorage.getItem('employeeId')) {
             tableContent += '</tbody>';
             shredRequestTable.innerHTML = tableContent;
         }).catch(error => {
+
+            ShredderSwal.close();
+
             Swal.fire({
                 title: 'Error!',
                 text: `${error}`,
@@ -251,8 +307,17 @@ function completeShredRequest(denyButton) {
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) {
+
+            ShredderSwal.fire({
+                title: 'Shredding file ...',
+                html: `Please wait while we shred the file: <b>${filepath}</b>`,
+            });
+
             invoke('complete_shred_request', { shredfile: filepath })
                 .then(response => {
+
+                    ShredderSwal.close();
+
                     if (response == "success") {
                         Swal.fire({
                             title: 'Shredded!',
@@ -270,6 +335,9 @@ function completeShredRequest(denyButton) {
                         });
                     }
                 }).catch(error => {
+
+                    ShredderSwal.close();
+
                     if (error.toString().toLowerCase().includes('no such file or directory')) {
                         Swal.fire({
                             title: 'Error!',

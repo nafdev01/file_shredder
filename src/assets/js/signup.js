@@ -1,6 +1,14 @@
 // initialize the tauri API for invoking the tauri functions 
 const { invoke } = window.__TAURI__;
 
+const SignupSwal = Swal.mixin({
+    showConfirmButton: false,
+    didOpen: () => {
+        Swal.showLoading();
+        Swal.getPopup().querySelector("b");
+    },
+});
+
 // Regular expressions for validating user input
 const usernamePattern = /^.{6,}$/;
 const phonePattern = /^\d{10}$/;
@@ -19,6 +27,11 @@ function checkAgreement(agreeCheckbox) {
 }
 
 employeeForm.addEventListener('submit', (event) => {
+    SignupSwal.fire({
+        title: 'Signing up employee ...',
+        html: 'Please wait while we process your application <b></b>',
+    });
+
     event.preventDefault();
 
     const employeeFullName = document.querySelector('#employee-signup-name').value;
@@ -78,7 +91,6 @@ employeeForm.addEventListener('submit', (event) => {
         return;
     }
 
-
     invoke('create_employee', {
         fullname: employeeFullName,
         username: employeeUsername,
@@ -87,6 +99,9 @@ employeeForm.addEventListener('submit', (event) => {
         department: employeeDepartment,
         password: employeePassword,
     }).then(response => {
+
+        SignupSwal.close();
+
         Swal.fire({
             title: "Signup Successful!",
             text: "Do you want to login now?",
@@ -135,10 +150,5 @@ invoke('get_departments').then(response => {
         option.value = department.department_name;
         option.textContent = department.department_name;
         select.appendChild(option);
-    });
-    Swal.fire({
-        title: 'Error!',
-        text: `${error}`,
-        icon: 'success'
     });
 });

@@ -1,6 +1,13 @@
 const { invoke } = window.__TAURI__;
 const { open } = window.__TAURI__.dialog;
 
+const SearchSwal = Swal.mixin({
+    showConfirmButton: false,
+    didOpen: () => {
+        Swal.showLoading();
+        Swal.getPopup().querySelector("b");
+    },
+});
 
 function formatTimestamp(searched_at) {
     // Create a Date object from the timestamp string
@@ -81,15 +88,15 @@ if (document.querySelector('#dir-button')) {
             const employeeId = parseInt(localStorage.getItem('employeeId'));
 
             // Show the loading spinner
-            Swal.fire({
-                html: `<h3>Fetching files... <b></b></h3>`,
-                didOpen: () => {
-                    Swal.showLoading();
-                    Swal.getPopup().querySelector("b");
-                },
-            })
+            SearchSwal.fire({
+                title: 'Searching for files ...',
+                html: `Please wait while we search for files matching <b>${pattern}</b> in <b>${directory}</b>`
+            });
 
             invoke('find_files', { pattern: pattern, directory: directory, searcher: parseInt(employeeId) }).then(files => {
+
+                SearchSwal.close();
+
                 const resultsContainer = document.getElementById('results-container');
                 resultsContainer.innerHTML = '';
                 const directoryPath = document.getElementById('dir-path').value;
@@ -162,7 +169,9 @@ if (document.querySelector('#dir-button')) {
             });
         });
     } catch (error) {
-        // output the error
+
+        SearchSwal.close();
+
         Swal.fire({
             icon: 'error',
             title: error.message
@@ -180,7 +189,15 @@ if (document.querySelector('#history-table')) {
         const userName = localStorage.getItem('employeeUsername');
         const employeeId = parseInt(localStorage.getItem('employeeId'));
 
+        SearchSwal.fire({
+            title: 'Fetching search history ...',
+            html: `Please wait while we fetch search history for <b>${userName}</b>`
+        });
+
         invoke('get_search_history', { searcher: parseInt(employeeId) }).then(history => {
+
+            SearchSwal.close();
+
             if (history.length === 0) {
                 const noHistoryElement = document.createElement('p');
                 noHistoryElement.textContent = 'No search history';
@@ -216,6 +233,9 @@ if (document.querySelector('#history-table')) {
                 });
             }
         }).catch(error => {
+
+            SearchSwal.close();
+
             Swal.fire({
                 icon: 'error',
                 title: error,
@@ -251,7 +271,16 @@ function shredRequest(shredButton) {
         buttonsStyling: false,
     }).then((result) => {
         if (result.isConfirmed) {
+
+            SearchSwal.fire({
+                title: 'Submitting shred request ...',
+                html: `Please wait while we submit a shred request for the file: <b>${filepath}</b>`
+            });
+
             invoke('create_shred_request', { requestby: employeeId, filepath: filepath }).then(response => {
+
+                SearchSwal.close();
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Request submitted!',
@@ -259,6 +288,9 @@ function shredRequest(shredButton) {
                     text: response,
                 });
             }).catch(error => {
+
+                SearchSwal.close();
+
                 Swal.fire({
                     icon: 'error',
                     title: error,
