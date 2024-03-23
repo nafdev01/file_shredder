@@ -2,20 +2,28 @@ use crate::initialize_app::CustomError;
 use crate::initialize_app::ShredRequest;
 use crate::shred_file::shred_file;
 use tokio_postgres::NoTls;
+use notify_rust::Notification as DesktopNotification;
+
 
 #[tauri::command]
 pub async fn create_shred_request(requestby: i32, filepath: String) -> Result<(), String> {
     let (client, connection) = match tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await {
+    )
+    .await
+    {
         Ok((client, connection)) => (client, connection),
         Err(e) => return Err(format!("Failed to connect to the database: {}", e)),
     };
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
@@ -33,11 +41,16 @@ pub async fn get_pending_shred_requests(requestto: i32) -> Result<Vec<ShredReque
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
@@ -70,11 +83,16 @@ pub async fn get_denied_shred_requests(requestto: i32) -> Result<Vec<ShredReques
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
@@ -107,11 +125,16 @@ pub async fn get_approved_shred_requests(requestto: i32) -> Result<Vec<ShredRequ
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
@@ -144,18 +167,28 @@ pub async fn update_shred_request(requestid: i32, requeststatus: String) -> Resu
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await.map_err(|e| format!("Failed to connect to the database: {}", e))?;
+    )
+    .await
+    .map_err(|e| format!("Failed to connect to the database: {}", e))?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
-    client.execute(
-        "UPDATE shredrequests SET requeststatus = $1 WHERE requestid = $2",
-        &[&requeststatus, &requestid],
-    ).await.map(|_| "Success".to_string()).map_err(|e| format!("Failed to execute query: {}", e))
+    client
+        .execute(
+            "UPDATE shredrequests SET requeststatus = $1 WHERE requestid = $2",
+            &[&requeststatus, &requestid],
+        )
+        .await
+        .map(|_| "Success".to_string())
+        .map_err(|e| format!("Failed to execute query: {}", e))
 }
 
 #[tauri::command]
@@ -165,11 +198,16 @@ pub async fn get_employee_denied_shred_requests(
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
@@ -197,7 +235,6 @@ pub async fn get_employee_denied_shred_requests(
     Ok(shredrequests)
 }
 
-
 #[tauri::command]
 pub async fn get_employee_approved_shred_requests(
     requestby: i32,
@@ -205,11 +242,16 @@ pub async fn get_employee_approved_shred_requests(
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
@@ -238,11 +280,36 @@ pub async fn get_employee_approved_shred_requests(
 }
 
 #[tauri::command]
-pub async fn complete_shred_request(shredfile: String) -> Result<String, String> {
-    let path = shredfile; // shredfile is already a String representing the path
+pub async fn complete_shred_request(shredfile: String) -> Result<String, CustomError> {
+    let (client, connection) = tokio_postgres::connect(
+        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        NoTls,
+    )
+    .await?;
 
-    match shred_file(&path).await {
-        Ok(_) => Ok("success".to_string()),
-        Err(e) => Err(e.to_string()),
-    }
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
+        }
+    });
+
+    match shred_file(&shredfile).await {
+        Ok(_) => (),
+        Err(e) => return Err(e),
+    };
+
+    client
+        .execute(
+            "UPDATE shredrequests 
+        SET deletion_complete = $1
+        WHERE filepath = $2",
+            &[&"Yes", &shredfile],
+        )
+        .await?;
+
+    Ok("success".to_string())
 }

@@ -3,26 +3,34 @@ use crate::initialize_app::CustomError;
 use crate::initialize_app::Employee;
 use sha1::Digest;
 use tokio_postgres::NoTls;
+use notify_rust::Notification as DesktopNotification;
 
 #[tauri::command]
 pub async fn get_employee(username: String) -> Result<Employee, CustomError> {
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
-    let rows = client.query(
-        "SELECT employeeid, fullname, username, email, phone, department 
+    let rows = client
+        .query(
+            "SELECT employeeid, fullname, username, email, phone, department 
         FROM employees 
         WHERE username = $1",
-        &[&username],
-    ).await?;
+            &[&username],
+        )
+        .await?;
 
     if let Some(row) = rows.iter().next() {
         Ok(Employee {
@@ -45,20 +53,27 @@ pub async fn get_admin(username: String) -> Result<Admin, CustomError> {
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
-    let rows = client.query(
-        "SELECT adminid, fullname, username, email, phone, department, created_at 
+    let rows = client
+        .query(
+            "SELECT adminid, fullname, username, email, phone, department, created_at 
         FROM admins 
         WHERE username = $1",
-        &[&username],
-    ).await?;
+            &[&username],
+        )
+        .await?;
 
     if let Some(row) = rows.iter().next() {
         Ok(Admin {
@@ -87,24 +102,30 @@ pub async fn update_employee(
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
-    client.execute(
-        "UPDATE employees 
+    client
+        .execute(
+            "UPDATE employees 
         SET fullname = $1, username = $2, email = $3, phone = $4
         WHERE employeeid = $5",
-        &[&fullname, &username, &email, &phone, &employeeid],
-    ).await?;
+            &[&fullname, &username, &email, &phone, &employeeid],
+        )
+        .await?;
 
     Ok(())
 }
-
 
 #[tauri::command]
 pub async fn change_employee_password(
@@ -121,20 +142,27 @@ pub async fn change_employee_password(
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
-    let user_iter = client.query(
-        "SELECT password 
+    let user_iter = client
+        .query(
+            "SELECT password 
         FROM employees 
         WHERE employeeid = $1",
-        &[&employeeid],
-    ).await?;
+            &[&employeeid],
+        )
+        .await?;
 
     if let Some(user) = user_iter.iter().next() {
         let password: Option<String> = user.get::<_, Option<String>>("password");
@@ -142,15 +170,17 @@ pub async fn change_employee_password(
             Some(password) => {
                 let oldhashed: String = hex::encode(sha1::Sha1::digest(oldpassword.as_bytes()));
                 if password == oldhashed {
-                    client.execute(
-                        "UPDATE employees 
+                    client
+                        .execute(
+                            "UPDATE employees 
                         SET password = $1
                         WHERE employeeid = $2",
-                        &[
-                            &hex::encode(sha1::Sha1::digest(newpassword.as_bytes())),
-                            &employeeid,
-                        ],
-                    ).await?;
+                            &[
+                                &hex::encode(sha1::Sha1::digest(newpassword.as_bytes())),
+                                &employeeid,
+                            ],
+                        )
+                        .await?;
                     Ok(())
                 } else {
                     Err(CustomError::AuthenticationError(
@@ -180,20 +210,27 @@ pub async fn update_admin(
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
-    client.execute(
-        "UPDATE admins 
+    client
+        .execute(
+            "UPDATE admins 
         SET fullname = $1, username = $2, email = $3, phone = $4
         WHERE adminid = $5",
-        &[&fullname, &username, &email, &phone, &adminid],
-    ).await?;
+            &[&fullname, &username, &email, &phone, &adminid],
+        )
+        .await?;
 
     Ok(())
 }
@@ -213,20 +250,27 @@ pub async fn change_admin_password(
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
-    let user_iter = client.query(
-        "SELECT password 
+    let user_iter = client
+        .query(
+            "SELECT password 
         FROM admins 
         WHERE adminid = $1",
-        &[&adminid],
-    ).await?;
+            &[&adminid],
+        )
+        .await?;
 
     if let Some(user) = user_iter.iter().next() {
         let password: Option<String> = user.get::<_, Option<String>>("password");
@@ -234,15 +278,17 @@ pub async fn change_admin_password(
             Some(password) => {
                 let oldhashed: String = hex::encode(sha1::Sha1::digest(oldpassword.as_bytes()));
                 if password == oldhashed {
-                    client.execute(
-                        "UPDATE admins 
+                    client
+                        .execute(
+                            "UPDATE admins 
                         SET password = $1
                         WHERE adminid = $2",
-                        &[
-                            &hex::encode(sha1::Sha1::digest(newpassword.as_bytes())),
-                            &adminid,
-                        ],
-                    ).await?;
+                            &[
+                                &hex::encode(sha1::Sha1::digest(newpassword.as_bytes())),
+                                &adminid,
+                            ],
+                        )
+                        .await?;
                     Ok(())
                 } else {
                     Err(CustomError::AuthenticationError(

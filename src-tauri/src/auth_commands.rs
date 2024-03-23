@@ -2,6 +2,8 @@ use crate::initialize_app::Admin;
 use crate::initialize_app::CustomError;
 use crate::initialize_app::Department;
 use crate::initialize_app::Employee;
+use notify_rust::Notification as DesktopNotification;
+
 use sha1::Digest;
 use tokio_postgres::NoTls;
 
@@ -10,18 +12,25 @@ pub async fn get_departments() -> Result<Vec<Department>, CustomError> {
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
-    let rows = client.query(
-        "SELECT department_id, department_name from departments",
-        &[]
-    ).await?;
+    let rows = client
+        .query(
+            "SELECT department_id, department_name from departments",
+            &[],
+        )
+        .await?;
 
     let mut departments = Vec::new();
 
@@ -36,7 +45,6 @@ pub async fn get_departments() -> Result<Vec<Department>, CustomError> {
     Ok(departments)
 }
 
-
 #[tauri::command]
 pub async fn create_employee(
     fullname: String,
@@ -49,11 +57,16 @@ pub async fn create_employee(
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
@@ -66,27 +79,37 @@ pub async fn create_employee(
 }
 
 #[tauri::command]
-pub async fn authenticate_employee(username: String, password: String) -> Result<Employee, CustomError> {
+pub async fn authenticate_employee(
+    username: String,
+    password: String,
+) -> Result<Employee, CustomError> {
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
-    let rows = client.query(
-        "SELECT employeeid, fullname, username, email, phone, department 
+    let rows = client
+        .query(
+            "SELECT employeeid, fullname, username, email, phone, department 
         FROM employees 
         WHERE username = $1 AND password = $2",
-        &[
-            &username,
-            &hex::encode(sha1::Sha1::digest(password.as_bytes())),
-        ],
-    ).await?;
+            &[
+                &username,
+                &hex::encode(sha1::Sha1::digest(password.as_bytes())),
+            ],
+        )
+        .await?;
 
     if let Some(row) = rows.iter().next() {
         Ok(Employee {
@@ -108,23 +131,30 @@ pub async fn authenticate_admin(username: String, password: String) -> Result<Ad
     let (client, connection) = tokio_postgres::connect(
         "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
         NoTls,
-    ).await?;
+    )
+    .await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 
-    let rows = client.query(
-        "SELECT adminid, fullname, username, email, phone, department 
+    let rows = client
+        .query(
+            "SELECT adminid, fullname, username, email, phone, department 
         FROM admins 
         WHERE username = $1 AND password = $2",
-        &[
-            &username,
-            &hex::encode(sha1::Sha1::digest(password.as_bytes())),
-        ],
-    ).await?;
+            &[
+                &username,
+                &hex::encode(sha1::Sha1::digest(password.as_bytes())),
+            ],
+        )
+        .await?;
 
     if let Some(row) = rows.iter().next() {
         Ok(Admin {

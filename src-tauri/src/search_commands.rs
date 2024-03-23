@@ -18,7 +18,11 @@ pub async fn log_search(
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+            .summary("SFS")
+            .body(&e.to_string())
+            .show()
+            .unwrap();
         }
     });
 
@@ -81,7 +85,11 @@ pub async fn get_search_history(searcher: i32) -> Result<Vec<Search>, CustomErro
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
+            DesktopNotification::new()
+                .summary("SFS")
+                .body(&e.to_string())
+                .show()
+                .unwrap();
         }
     });
 

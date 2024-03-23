@@ -10,6 +10,7 @@ use tauri::InvokeError;
 pub enum CustomError {
     DatabaseError(Error),
     AuthenticationError(String),
+    ShreddingError(String),
     // Add other kinds of errors as needed
 }
 
@@ -24,6 +25,7 @@ impl Into<InvokeError> for CustomError {
         match self {
             CustomError::DatabaseError(err) => InvokeError::from(err.to_string()),
             CustomError::AuthenticationError(err) => InvokeError::from(err),
+            CustomError::ShreddingError(err) => InvokeError::from(err),
         }
     }
 }
@@ -33,6 +35,7 @@ impl fmt::Display for CustomError {
         match self {
             CustomError::DatabaseError(err) => write!(f, "Database Error: {}", err),
             CustomError::AuthenticationError(err) => write!(f, "Authentication Error: {}", err),
+            CustomError::ShreddingError(err) => write!(f, "Shredding Error: {}", err),
         }
     }
 }
