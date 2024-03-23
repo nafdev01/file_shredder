@@ -17,10 +17,10 @@ pub async fn log_search(
     ).await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
             .summary("SFS")
-            .body(&e.to_string())
+            .body(&"Error connecting to server. Check your internet connection and try again".to_string())
             .show()
             .unwrap();
         }
@@ -64,10 +64,10 @@ pub async fn find_files(pattern: String, directory: String, searcher: i32) -> Re
                 .show()
                 .unwrap();
         }
-        Err(e) => {
+        Err(_) => {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -84,10 +84,10 @@ pub async fn get_search_history(searcher: i32) -> Result<Vec<Search>, CustomErro
     ).await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }

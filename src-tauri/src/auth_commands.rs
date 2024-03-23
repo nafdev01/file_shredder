@@ -16,10 +16,10 @@ pub async fn get_departments() -> Result<Vec<Department>, CustomError> {
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -61,10 +61,10 @@ pub async fn create_employee(
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -90,10 +90,10 @@ pub async fn authenticate_employee(
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -135,10 +135,10 @@ pub async fn authenticate_admin(username: String, password: String) -> Result<Ad
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }

@@ -18,10 +18,10 @@ pub async fn create_shred_request(requestby: i32, filepath: String) -> Result<()
     };
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -45,10 +45,10 @@ pub async fn get_pending_shred_requests(requestto: i32) -> Result<Vec<ShredReque
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -87,10 +87,10 @@ pub async fn get_denied_shred_requests(requestto: i32) -> Result<Vec<ShredReques
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -129,10 +129,10 @@ pub async fn get_approved_shred_requests(requestto: i32) -> Result<Vec<ShredRequ
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -172,10 +172,10 @@ pub async fn update_shred_request(requestid: i32, requeststatus: String) -> Resu
     .map_err(|e| format!("Failed to connect to the database: {}", e))?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -202,10 +202,10 @@ pub async fn get_employee_denied_shred_requests(
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -246,10 +246,10 @@ pub async fn get_employee_approved_shred_requests(
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -288,10 +288,10 @@ pub async fn complete_shred_request(shredfile: String) -> Result<String, CustomE
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }

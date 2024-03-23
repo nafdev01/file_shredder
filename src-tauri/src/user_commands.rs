@@ -14,10 +14,10 @@ pub async fn get_employee(username: String) -> Result<Employee, CustomError> {
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -57,10 +57,10 @@ pub async fn get_admin(username: String) -> Result<Admin, CustomError> {
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -106,10 +106,10 @@ pub async fn update_employee(
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -146,10 +146,10 @@ pub async fn change_employee_password(
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -214,10 +214,10 @@ pub async fn update_admin(
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
@@ -254,10 +254,10 @@ pub async fn change_admin_password(
     .await?;
 
     tokio::spawn(async move {
-        if let Err(e) = connection.await {
+        if let Err(_) = connection.await {
             DesktopNotification::new()
                 .summary("SFS")
-                .body(&e.to_string())
+                .body(&"Error connecting to server. Check your internet connection and try again".to_string())
                 .show()
                 .unwrap();
         }
