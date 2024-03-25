@@ -259,7 +259,7 @@ pub async fn get_employee_approved_shred_requests(
 
     let rows = client.query(
         "SELECT requestid, filepath, department, requeststatus, TO_CHAR(requestat, 'YYYY/MM/DD HH12:MM:SS') AS request_date,requestto from shredrequests 
-        WHERE requestby = $1 and requeststatus = 'Approved'",
+        WHERE requestby = $1 and requeststatus = 'Approved' and deletion_complete = 'No'",
         &[&requestby ],
     ).await?;
 
