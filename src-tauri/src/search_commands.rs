@@ -12,7 +12,7 @@ pub async fn log_search(
     files_found: &i32,
 ) -> Result<(), CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -75,7 +75,7 @@ pub async fn find_files(pattern: String, directory: String, searcher: i32) -> Re
 #[tauri::command]
 pub async fn get_search_history(searcher: i32) -> Result<Vec<Search>, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 

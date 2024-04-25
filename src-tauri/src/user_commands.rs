@@ -7,7 +7,7 @@ use tokio_postgres::NoTls;
 #[tauri::command]
 pub async fn get_employee(username: String) -> Result<Employee, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -43,7 +43,7 @@ pub async fn get_employee(username: String) -> Result<Employee, CustomError> {
 #[tauri::command]
 pub async fn get_admin(username: String) -> Result<Admin, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -85,7 +85,7 @@ pub async fn update_employee(
     phone: String,
 ) -> Result<(), CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -119,7 +119,7 @@ pub async fn change_employee_password(
     }
 
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -178,7 +178,7 @@ pub async fn update_admin(
     phone: String,
 ) -> Result<(), CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -211,7 +211,7 @@ pub async fn change_admin_password(
     }
 
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 

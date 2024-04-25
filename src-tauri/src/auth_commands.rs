@@ -8,7 +8,7 @@ use tokio_postgres::NoTls;
 #[tauri::command]
 pub async fn get_departments() -> Result<Vec<Department>, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -47,7 +47,7 @@ pub async fn create_employee(
     password: String,
 ) -> Result<(), CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -68,7 +68,7 @@ pub async fn create_employee(
 #[tauri::command]
 pub async fn authenticate_employee(username: String, password: String) -> Result<Employee, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -106,7 +106,7 @@ pub async fn authenticate_employee(username: String, password: String) -> Result
 #[tauri::command]
 pub async fn authenticate_admin(username: String, password: String) -> Result<Admin, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 

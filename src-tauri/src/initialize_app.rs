@@ -87,7 +87,7 @@ pub struct ShredRequest {
 // write code that initializes the database and creates the tables needed for the application.
 pub fn initialize_database() -> Result<(), CustomError> {
     let mut client = Client::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     )?;
 

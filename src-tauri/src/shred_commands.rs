@@ -6,7 +6,7 @@ use tokio_postgres::NoTls;
 #[tauri::command]
 pub async fn create_shred_request(requestby: i32, filepath: String) -> Result<(), String> {
     let (client, connection) = match tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await {
         Ok((client, connection)) => (client, connection),
@@ -31,7 +31,7 @@ pub async fn create_shred_request(requestby: i32, filepath: String) -> Result<()
 #[tauri::command]
 pub async fn get_pending_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -68,7 +68,7 @@ pub async fn get_pending_shred_requests(requestto: i32) -> Result<Vec<ShredReque
 #[tauri::command]
 pub async fn get_denied_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -105,7 +105,7 @@ pub async fn get_denied_shred_requests(requestto: i32) -> Result<Vec<ShredReques
 #[tauri::command]
 pub async fn get_approved_shred_requests(requestto: i32) -> Result<Vec<ShredRequest>, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -142,7 +142,7 @@ pub async fn get_approved_shred_requests(requestto: i32) -> Result<Vec<ShredRequ
 #[tauri::command]
 pub async fn update_shred_request(requestid: i32, requeststatus: String) -> Result<String, String> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await.map_err(|e| format!("Failed to connect to the database: {}", e))?;
 
@@ -163,7 +163,7 @@ pub async fn get_employee_denied_shred_requests(
     requestby: i32,
 ) -> Result<Vec<ShredRequest>, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 
@@ -203,7 +203,7 @@ pub async fn get_employee_approved_shred_requests(
     requestby: i32,
 ) -> Result<Vec<ShredRequest>, CustomError> {
     let (client, connection) = tokio_postgres::connect(
-        "postgresql://priestley:PassMan2024@64.23.233.35/shredder",
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set").as_str(),
         NoTls,
     ).await?;
 

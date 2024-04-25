@@ -8,11 +8,14 @@ mod search_commands;
 mod user_commands;
 mod shred_commands;
 mod shred_file;
+use dotenv::dotenv;
+
 
 use crate::initialize_app::initialize_database;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    dotenv().ok(); // This line loads the environment variables from the ".env" file.
     match initialize_database() {
         Ok(_) => {}
         Err(e) => {

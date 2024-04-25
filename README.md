@@ -32,14 +32,19 @@ To install SFS, follow these steps:
    cd file_shredder
    ```
 
-3. Build the project:
+3. Create a .env file and add your postgresql database URL:
    ```
-   cargo build --release
+   DATABASE_URL=postgres://username:password@localhost/dbname
    ```
 
-4. Run the application:
+4. Run the project in develpment moed:
    ```
-   ./target/release/file_shredder
+   cargo tauri dev
+   ```
+
+5. Build the project to generate a binary file:
+   ```
+   cargo tauri build
    ```
 
 ## Usage

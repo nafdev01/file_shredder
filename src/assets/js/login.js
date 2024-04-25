@@ -34,6 +34,9 @@ employeeForm.addEventListener('submit', (event) => {
         if (error.toString().toLowerCase().includes('query returned no rows')) {
             errorMessage = 'Invalid employee username or password';
         }
+        else {
+            errorMessage = error;
+        }
 
         Swal.fire({
             title: 'Error!',
